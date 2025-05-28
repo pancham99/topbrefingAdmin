@@ -55,7 +55,7 @@ const Profile = () => {
   const get_profile = async () => {
     try {
       const { data } = await axios.get(
-        `http://localhost:5000/api/news/get_user`,
+        `${base_url}/api/news/get_user`,
         {
           headers: {
             Authorization: `Bearer ${store.token}`,
