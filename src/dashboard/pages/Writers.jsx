@@ -92,8 +92,10 @@ const Writers = () => {
                                 <td className='px-6 py-4'>{r.category}</td>
                                 <td className='px-6 py-4'>{r.role}</td>
                                 <td className='px-6 py-4'>
-                                    <img className='w-[40px] h-[40px]' src='https://keralakaumudi.com/web-news/en/2023/09/NMAN0435859/image/vagamon.1694140764.jpg' alt='' />
+                                    <img className='w-[40px] h-[40px]' src={r.image} alt='' />
                                 </td>
+
+                                
 
                                 <td className='px-6 py-4'>{r.email}</td>
                                 {/* <td className='px-6 py-4'>Jan 15, 2024</td>
