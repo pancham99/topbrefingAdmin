@@ -4,10 +4,13 @@ import { FaEye } from "react-icons/fa";
 import axios from 'axios'
 import { base_url } from '../../config/config'
 import storeContext from '../../context/storeContext'
+import toast from 'react-hot-toast'
 
 const Writers = () => {
     const { store } = useContext(storeContext)
     const [writers, setWriters] = useState([])
+
+    console.log(writers, 'writers')
 
     const get_writers = async () => {
         try {
@@ -17,7 +20,7 @@ const Writers = () => {
                     'Authorization': `Bearer ${store.token}`
                 }
             })
-            
+
             setWriters(data.writers)
         } catch (error) {
             console.log(error)
@@ -27,6 +30,39 @@ const Writers = () => {
     useEffect(() => {
         get_writers()
     }, [])
+    const [res, setRes] = useState({
+        id: '',
+        loader: false,
+
+    })
+
+     const update_status = async (status, user_id) => {
+        try {
+
+            setRes({
+                id: user_id,
+                loader: true
+            })
+            const { data } = await axios.put(`${base_url}/api/news/writer_status-update/${user_id}`, { status }, {
+                headers: {
+                    'Authorization': `Bearer ${store.token}`
+                }
+            })
+            setRes({
+                id: user_id,
+                loader: false
+            })
+            toast.success(data.message)
+           get_writers()
+
+            console.log(data)
+        } catch (error) {
+            console.log(error.message)
+            toast.error(error.response.data.message)
+        }
+    }
+
+
 
     return (
         <div className='bg-white rounded-md'>
@@ -66,7 +102,16 @@ const Writers = () => {
                          </td> */}
                                 <td className='px-6 py-4'>
                                     <div className='flex justify-start items-center gap-x-4 text-white'>
-                                        <Link to={`/dashboard/writer/${r._id}`} className='p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50'><FaEye /></Link>
+
+                                        {
+                                            r.status === 'active' && <span onClick={() => update_status('deactive', r._id)} className='px-2 py-[2px] bg-green-100 text-green-800 rounded-lg text-xs cursor-pointer'>{res.loader && res.id === r._id ? 'Loading..' : r.status}</span>
+                                        }
+
+                                        {
+                                                r.status === 'deactive' && <span onClick={() => update_status('active', r._id)} className='px-2 py-[2px] bg-red-100 text-red-800 rounded-lg text-xs cursor-pointer'>{res.loader && res.id === r._id ? 'Loading..' : r.status}</span>
+                                            }
+
+                                        {/* <Link to={`/dashboard/writer/${r._id}`} className='p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50'><FaEye /></Link> */}
                                         {/* <Link className='p-[6px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEdit/></Link>
                                  <div className='p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50'><FaTrash/></div> */}
                                     </div>
