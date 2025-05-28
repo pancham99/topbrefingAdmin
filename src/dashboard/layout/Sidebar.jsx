@@ -17,7 +17,7 @@ const Sidebar = () => {
     const {store, dispatch} = useContext(storeContext)
 
     const logout = () => {
-        localStorage.removeItem('newsToken')
+        localStorage.removeItem('newstoken')
         dispatch({type: 'logout', payload: ''})
         navigate('/login')
     }

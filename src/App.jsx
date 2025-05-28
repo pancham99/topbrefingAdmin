@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './dashboard/layout/MainLayout';
 import Login from './dashboard/pages/Login';
@@ -16,60 +16,39 @@ import Edit_news from './dashboard/pages/Edit_news';
 import storeContext from './context/storeContext';
 
 function App() {
-  const { store } = useContext(storeContext);
+  
+
+   const { store } = useContext(storeContext)
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* ✅ Login Page - always accessible */}
+      {/* <Route path='admin' element={<AdminIndex/>} /> */}
         <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<ProtectDashboard/>}>
+          <Route path='' element={<MainLayout />}>
 
-        {/* ✅ Dashboard - protected by token */}
-        <Route
-          path="/dashboard"
-          element={
-            store?.token ? (
-              <ProtectDashboard />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        >
-          <Route path="" element={<MainLayout />}>
-            {/* ✅ Role-based dashboard redirection */}
-            <Route
-              index
-              element={
-                store?.userInfo?.role === 'admin' ? (
-                  <Navigate to="/dashboard/admin" />
-                ) : (
-                  <Navigate to="/dashboard/writer" />
-                )
-              }
-            />
+          <Route path="" element={store?.userInfo?.role === 'admin' ? <Navigate to="/dashboard/admin" /> : <Navigate to="/dashboard/writer" />}/>
+            {/* <Route path='' element={store.userInfo.role === 'admin' ? <Navigate to ='/dashboard/admin'/> : <Navigate to ='/dashboard/writer'/>}/> */}
+            <Route path='unable-access' element={<Unable/>} />
+            <Route path='news' element={<News/>} />
+            <Route path='profile' element={<Profile/>} />
 
-            <Route path="unable-access" element={<Unable />} />
-            <Route path="news" element={<News />} />
-            <Route path="profile" element={<Profile />} />
-
-            {/* ✅ Admin Routes */}
-            <Route path="" element={<ProtectRole role="admin" />}>
-              <Route path="admin" element={<AdminIndex />} />
-              <Route path="writer/add" element={<AddWriter />} />
-              <Route path="writers" element={<Writers />} />
+            <Route path='' element={<ProtectRole role='admin'/>}>
+              <Route path='admin' element={<AdminIndex/>} />
+              <Route path='writer/add' element={<AddWriter/>} />
+              <Route path='writers' element={<Writers/>} />
             </Route>
 
-            {/* ✅ Writer Routes */}
-            <Route path="" element={<ProtectRole role="writer" />}>
-              <Route path="writer" element={<WriterIndex />} />
-              <Route path="news/create" element={<CreateNews />} />
-              <Route path="news/edit/:news_id" element={<Edit_news />} />
+            <Route path='' element={<ProtectRole role='writer'/>}>
+              <Route path='writer' element={<WriterIndex/>} />
+              <Route path='news/create' element={<CreateNews/>} />
+              <Route path='news/edit/:news_id' element={<Edit_news/>} />
             </Route>
+
+
           </Route>
         </Route>
-
-        {/* ✅ Catch-all route */}
-        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );

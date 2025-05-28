@@ -4,10 +4,7 @@ import storeContext from '../context/storeContext';
 
 const ProtectRole = ({ role }) => {
   const { store } = useContext(storeContext)
-  const userInfo = {
-    name: "madhu",
-    role: "admin"
-  };
+ 
 
   // Check if the user's role matches the required role
   if (store.userInfo?.role === role) {
