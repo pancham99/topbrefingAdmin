@@ -30,6 +30,9 @@ const Login = () => {
     try {
       setLoder(true)
       const { data } = await axios.post(`${base_url}/api/login`, state)
+      if (data.success === true) {
+        navigate('/dashboard')
+      }
       setLoder(false)
       localStorage.setItem('newstoken', data.token)
       tost.success(data.message)
@@ -39,7 +42,8 @@ const Login = () => {
           token: data.token
         }
       })
-      navigate('/dashboard')
+      
+
     } catch (error) {
       setLoder(false)
       tost.error(error.response.data.message)
