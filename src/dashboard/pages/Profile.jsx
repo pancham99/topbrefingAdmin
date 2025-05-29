@@ -5,17 +5,25 @@ import { MdCloudUpload } from "react-icons/md";
 import axios from "axios";
 import { base_url } from "../../config/config";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import tost from 'react-hot-toast'
 
 const Profile = () => {
   const { store } = useContext(storeContext);
-
+  const navigate = useNavigate()
   const [profile, serProfile] = useState([]);
 
-  console.log(profile, "profile");
-
-  const [image, setImage] = useState( "");
+  const [image, setImage] = useState("");
   const [img, setImg] = useState("");
-  const [loader, setLoader] = useState(false);
+  const [loader, setLoader] = useState("");
+
+  const [state, setState] = useState({
+    email: profile?.user?.email,
+    old_password: '',
+    new_password: ''
+  })
+
+
 
   const imageHandle = (e) => {
     const { files } = e.target;
@@ -31,9 +39,9 @@ const Profile = () => {
     formData.append("image", image);
 
     try {
-      setLoader(true);
+      setLoader("avatar");
       const { data } = await axios.put(
-        `http://localhost:5000/api/news/update_avatar`,
+        `${base_url}/api/news/update_avatar`,
         formData,
         {
           headers: {
@@ -42,13 +50,13 @@ const Profile = () => {
         }
       );
 
-      setLoader(false);
+      setLoader("");
       console.log(data.user, "updated user");
-      // toast.success(data.message);
+      tost.success(data.message);
     } catch (error) {
-      setLoader(false);
+      setLoader("");
       console.error(error);
-      // toast.error(error.response.data.message);
+      tost.error(error.response.data.message);
     }
   };
 
@@ -68,19 +76,69 @@ const Profile = () => {
     }
   };
 
+
+
+
+
+
+  const inputHandle = (e) => {
+    setState({
+      ...state,
+      [e.target.name]: e.target.value
+
+    })
+  }
+
+
+
+
+  const submit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoader("password");
+      const { data } = await axios.put(
+        `${base_url}/api/news/rest_user_password`,
+        state,
+        {
+          headers: {
+            Authorization: `Bearer ${store.token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setLoader("");
+      tost.success(data.message || "Password changed successfully");
+
+      navigate('/login');
+    } catch (error) {
+      console.error(error);
+      tost.error(error.response.data.message)
+      setLoader("");
+    }
+  };
+
+
+
+  useEffect(() => {
+    if (profile?.user?.email) {
+      setState(prev => ({ ...prev, email: profile.user.email }));
+    }
+  }, [profile]);
+
   useEffect(() => {
     get_profile();
   }, []);
 
 
 
-// Assuming `profile.user.image` updates later
-useEffect(() => {
-  if (profile?.user?.image) {
-    setImage(profile?.user?.image);
-    setImg(profile?.user?.image);
-  }
-}, [profile?.user?.image]);
+  // Assuming `profile.user.image` updates later
+  useEffect(() => {
+    if (profile?.user?.image) {
+      setImage(profile?.user?.image);
+      setImg(profile?.user?.image);
+    }
+  }, [profile?.user?.image]);
 
   return (
     <div className="w-full grid grid-cols-2 gap-x-6 mt-5">
@@ -116,10 +174,10 @@ useEffect(() => {
           <div className="mt-2">
             <button
               type="submit"
-              disabled={loader}
+              disabled={loader === "avatar"}
               className="px-3 py-[6px] bg-purple-500 rounded-md text-white hover:bg-purple-600"
             >
-              {loader ? "lodding.." : "Update Avatar"}
+              {loader === "avatar" ? "Loading..." : "Update Avatar"}
             </button>
           </div>
         </form>
@@ -135,7 +193,7 @@ useEffect(() => {
       <div className="bg-white px-6 py-4 text-[#404040]">
         <h2 className="pb-3 text-center">Change password</h2>
 
-        <from>
+        <form onSubmit={submit}>
           <div>
             <div className="flex flex-col gap-y-2 mb-5">
               <label
@@ -147,6 +205,8 @@ useEffect(() => {
               <input
                 type="password"
                 placeholder="Old Password"
+                onChange={inputHandle}
+                value={state.old_password}
                 name="old_password"
                 className="px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10"
                 id="old_password"
@@ -162,6 +222,8 @@ useEffect(() => {
               </label>
               <input
                 name="new_password"
+                onChange={inputHandle}
+                value={state.new_password}
                 id="new_password"
                 type="password"
                 placeholder="New Password"
@@ -171,14 +233,18 @@ useEffect(() => {
 
             <div className="mt-2">
               <button
+                disabled={loader === "password"}
+                type="submit"
                 className="px-3 py-[6px] bg-purple-500 rounded-md text-white hover:bg-purple-600"
                 to="/dashboard/writers"
               >
-                Change Password
+                {loader === "password" ? "Loading..." : "Change Password"}
+
+
               </button>
             </div>
           </div>
-        </from>
+        </form>
       </div>
     </div>
   );
