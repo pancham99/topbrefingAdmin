@@ -16,6 +16,9 @@ const NewContent = () => {
     const { store } = useContext(storeContext)
     const [news, setNews] = useState([])
     const [all_news, set_all_news] = useState([])
+    const [writers, setWriters] = useState([])
+
+    console.log(all_news, "all_news")
 
     const [parPage, setPerPage] = useState(5)
     const [pages, setPages] = useState(0)
@@ -39,8 +42,29 @@ const NewContent = () => {
         }
     }
 
+    const get_writers = async () => {
+        try {
+
+            const { data } = await axios.get(`${base_url}/api/news/writers`, {
+                headers: {
+                    'Authorization': `Bearer ${store.token}`
+                }
+            })
+
+            setWriters(data.writers)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // useEffect(() => {
+
+    // }, [])
+
     useEffect(() => {
         get_news()
+
+        get_writers()
     }, [])
 
     useEffect(() => {
@@ -58,6 +82,32 @@ const NewContent = () => {
             setPerPage(5)
         } else {
             const tempNews = all_news.filter(n => n.status === e.target.value)
+            setNews(tempNews)
+            setPage(1)
+            setPerPage(5)
+        }
+    }
+
+    const type_fillter_category = (e) => {
+        if (e.target.value === '') {
+            setNews(all_news)
+            setPage(1)
+            setPerPage(5)
+        } else {
+            const tempNews = all_news.filter(n => n.category === e.target.value)
+            setNews(tempNews)
+            setPage(1)
+            setPerPage(5)
+        }
+    }
+
+     const type_fillter_writer = (e) => {
+        if (e.target.value === '') {
+            setNews(all_news)
+            setPage(1)
+            setPerPage(5)
+        } else {
+            const tempNews = all_news.filter(n => n.writerName === e.target.value)
             setNews(tempNews)
             setPage(1)
             setPerPage(5)
@@ -110,6 +160,27 @@ const NewContent = () => {
                     <option value='pending'>pending</option>
                     <option value='active'>active</option>
                     <option value='deactive'>deactive</option>
+                </select>
+
+
+                <select onChange={type_fillter_category} name='' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
+
+                    <option value="">---select category--</option>
+                    <option value="Education">Education</option>
+                    <option value="Politics ">Politics </option>
+                    <option value="Health">Health</option>
+                    <option value="Inernational">Inernational</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Spiritual">Spiritual</option>
+                </select>
+
+
+                <select onChange={type_fillter_writer} name='' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
+
+                    <option value="">---select Writer--</option>
+                    {writers.map((w, i) => <option key={i} value={w.name}>{w.name}</option>)}
                 </select>
                 <input onChange={serach_news} type='text' placeholder='search news' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' />
             </div>
