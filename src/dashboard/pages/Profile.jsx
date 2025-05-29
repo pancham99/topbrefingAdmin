@@ -141,11 +141,11 @@ const Profile = () => {
   }, [profile?.user?.image]);
 
   return (
-    <div className="w-full grid grid-cols-2 gap-x-6 mt-5">
-      <div className="bg-white gap-x-3 p-6 rounded flex justify-center items-center">
+    <div className="w-full grid lg:grid-cols-2 gap-x-6 mt-5">
+      <div className="bg-white gap-x-3 p-6 rounded lg:flex flex-cols justify-center items-center">
         <form onSubmit={added}>
           <label
-            className={`w-[150px] h-[150px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed `}
+            className={`lg:w-[150px] w-full lg:h-[150px] h-full flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed `}
             htmlFor="img"
           >
             <div className="flex justify-center  items-center flex-col gap-y-2">

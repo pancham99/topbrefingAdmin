@@ -39,8 +39,8 @@ const AdminIndex = () => {
       const deactiveNews = all_news.filter(news => news.status === "deactive");
 
   return (
-    <div className='mt-3'>
-      <div className='grid grid-cols-5 gap-x-4'>
+    <div className='lg:mt-3 mt-0'>
+      <div className='grid lg:grid-cols-5 lg:gap-x-4 gap-4 lg:gap-0'>
 
         <div className='w-full p-8 flex justify-center flex-col rounded-md items-center gap-y-2 bg-white text-slate-700'>
           <span className='text-xl font-bold'>{all_news.length}</span>

@@ -153,8 +153,8 @@ const NewContent = () => {
 
     return (
         <div>
-            <div className='px-4 py-3 flex gap-x-3'>
-                <select onChange={type_fillter} name='' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
+            <div className='px-4 py-3 lg:flex flex-cols lg:gap-x-3  space-y-3 lg:space-y-0'>
+                <select onChange={type_fillter} name='' className='lg:px-3 w-full py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
 
                     <option value=''>---Select type---</option>
                     <option value='pending'>pending</option>
@@ -163,7 +163,7 @@ const NewContent = () => {
                 </select>
 
 
-                <select onChange={type_fillter_category} name='' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
+                <select onChange={type_fillter_category} name='' className='lg:px-3 w-full  py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
 
                     <option value="">---select category--</option>
                     <option value="Education">Education</option>
@@ -177,12 +177,12 @@ const NewContent = () => {
                 </select>
 
 
-                <select onChange={type_fillter_writer} name='' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
+                <select onChange={type_fillter_writer} name='' className='lg:px-3 w-full py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
 
                     <option value="">---select Writer--</option>
                     {writers.map((w, i) => <option key={i} value={w.name}>{w.name}</option>)}
                 </select>
-                <input onChange={serach_news} type='text' placeholder='search news' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' />
+                <input onChange={serach_news} type='text' placeholder='search news' className='lg:px-3 w-full  py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' />
             </div>
             <div className='relative overflow-x-auto p-4'>
                 <table className='w-full text-sm text-left text-slate-600'>

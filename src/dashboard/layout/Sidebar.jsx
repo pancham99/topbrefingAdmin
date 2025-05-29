@@ -23,7 +23,7 @@ const Sidebar = () => {
     }
 
     return (
-        <div className='w-[250px] h-screen fixed left-0 top-0 bg-white'>
+        <div className='w-[250px] h-screen fixed left-0 top-0 bg-white hidden lg:block'>
             <div className='h-[70px] flex justify-center items-center'>
                 <Link to="/">
                     <h1><span className='text-3xl text-slate-400 font-semibold'>Top</span><span className='text-sky-400'>Briefing</span></h1>

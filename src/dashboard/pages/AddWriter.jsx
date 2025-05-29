@@ -57,7 +57,7 @@ const AddWriter = () => {
       <div className='p-4'>
 
         <form onSubmit={submit}>
-          <div className='grid grid-cols-2 gap-x-8 mb-3'>
+          <div className='grid lg:grid-cols-2 gap-x-8 mb-3'>
             <div className='flex flex-col gap-y-2 mb-5'>
               <label className='text-md font-medium text-gray-600' htmlFor='name'>Name</label>
               <input onChange={inputHandler} value={state.name} required type='text' placeholder='name' name='name' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id='name' />
