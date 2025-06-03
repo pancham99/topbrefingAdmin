@@ -5,6 +5,7 @@ import axios from 'axios'
 import { base_url } from '../../config/config'
 import storeContext from '../../context/storeContext'
 import toast from 'react-hot-toast'
+import { MdDelete } from 'react-icons/md';
 
 const Writers = () => {
     const { store } = useContext(storeContext)
@@ -36,7 +37,7 @@ const Writers = () => {
 
     })
 
-     const update_status = async (status, user_id) => {
+    const update_status = async (status, user_id) => {
         try {
 
             setRes({
@@ -53,7 +54,7 @@ const Writers = () => {
                 loader: false
             })
             toast.success(data.message)
-           get_writers()
+            get_writers()
 
             console.log(data)
         } catch (error) {
@@ -61,6 +62,29 @@ const Writers = () => {
             toast.error(error.response.data.message)
         }
     }
+
+
+    const delete_writers = async (user_id) => {
+
+        console.log("Deleting news with ID:", user_id);
+        try {
+            if (!user_id) {
+                console.error("Invalid news ID");
+                return;
+            }
+
+            const response = await axios.delete(`${base_url}/api/news/writer/delete/${user_id}`, {
+                headers: {
+                    Authorization: `Bearer ${store?.token}`,
+                },
+            });
+            console.log("Delete response:", response.data);
+
+           get_writers()
+        } catch (error) {
+            console.error("Delete failed:", error?.response?.data?.message || error.message);
+        }
+    };
 
 
 
@@ -82,6 +106,7 @@ const Writers = () => {
                             <th className='px-7 py-3'>Image</th>
                             <th className='px-7 py-3'>Email</th>
                             <th className='px-7 py-3'>Active</th>
+                            <th className='px-7 py-3'>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,13 +120,11 @@ const Writers = () => {
                                     <img className='w-[40px] h-[40px]' src={r.image} alt='' />
                                 </td>
 
-                                
+
 
                                 <td className='px-6 py-4'>{r.email}</td>
-                                {/* <td className='px-6 py-4'>Jan 15, 2024</td>
-                         <td className='px-6 py-4'>
-                             <span className='px-2 py-[2px] bg-green-100 text-green-800 rounded-lg text-xs cursor-pointer'>active</span>
-                         </td> */}
+                                {/* <td className='px-6 py-4'>Jan 15, 2024</td>*/}
+
                                 <td className='px-6 py-4'>
                                     <div className='flex justify-start items-center gap-x-4 text-white'>
 
@@ -110,13 +133,18 @@ const Writers = () => {
                                         }
 
                                         {
-                                                r.status === 'deactive' && <span onClick={() => update_status('active', r._id)} className='px-2 py-[2px] bg-red-100 text-red-800 rounded-lg text-xs cursor-pointer'>{res.loader && res.id === r._id ? 'Loading..' : r.status}</span>
-                                            }
+                                            r.status === 'deactive' && <span onClick={() => update_status('active', r._id)} className='px-2 py-[2px] bg-red-100 text-red-800 rounded-lg text-xs cursor-pointer'>{res.loader && res.id === r._id ? 'Loading..' : r.status}</span>
+                                        }
 
                                         {/* <Link to={`/dashboard/writer/${r._id}`} className='p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50'><FaEye /></Link> */}
                                         {/* <Link className='p-[6px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEdit/></Link>
                                  <div className='p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50'><FaTrash/></div> */}
+
                                     </div>
+                                </td>
+
+                                <td className='px-6 py-4'>
+                                    <button onClick={() => delete_writers(r._id)} className='p-[6px]  rounded hover:shadow-lg hover:shadow-green-500/50'><MdDelete className='text-red-600 ' size={28} /></button>
                                 </td>
                             </tr>)
                         }

@@ -9,6 +9,7 @@ import { base_url } from '../../config/config'
 import storeContext from '../../context/storeContext'
 import { convert } from 'html-to-text'
 import toast from 'react-hot-toast'
+import { MdDelete } from "react-icons/md";
 
 
 const NewContent = () => {
@@ -17,8 +18,6 @@ const NewContent = () => {
     const [news, setNews] = useState([])
     const [all_news, set_all_news] = useState([])
     const [writers, setWriters] = useState([])
-
-    console.log(all_news, "all_news")
 
     const [parPage, setPerPage] = useState(5)
     const [pages, setPages] = useState(0)
@@ -41,6 +40,33 @@ const NewContent = () => {
             console.log(error.message)
         }
     }
+
+
+
+    const delete_news = async (news_id) => {
+
+        console.log("Deleting news with ID:", news_id);
+        try {
+            if (!news_id) {
+                console.error("Invalid news ID");
+                return;
+            }
+
+            const response = await axios.delete(`${base_url}/api/news/delete/${news_id}`, {
+                headers: {
+                    Authorization: `Bearer ${store?.token}`,  
+                },
+            });
+
+            // Refetch the news list
+            get_news();
+        } catch (error) {
+            console.error("Delete failed:", error?.response?.data?.message || error.message);
+        }
+    };
+
+
+
 
     const get_writers = async () => {
         try {
@@ -101,7 +127,7 @@ const NewContent = () => {
         }
     }
 
-     const type_fillter_writer = (e) => {
+    const type_fillter_writer = (e) => {
         if (e.target.value === '') {
             setNews(all_news)
             setPage(1)
@@ -195,7 +221,8 @@ const NewContent = () => {
                             <th className='px-7 py-3'>Description</th>
                             <th className='px-7 py-3'>Date</th>
                             <th className='px-7 py-3'>Status</th>
-                            <th className='px-7 py-3'>Active</th>
+                            {/* <th className='px-7 py-3'>Active</th> */}
+                            <th className='px-7 py-3'>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -240,16 +267,21 @@ const NewContent = () => {
                                         </td>
                                     }
                                     <td className='px-6 py-4'>
-                                        <div className='flex justify-start items-center gap-x-4 text-white'>
-                                            <Link className='p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50'><FaEye /></Link>
+                                        <div className='px-6 py-4'>
+                                            <button onClick={() => delete_news(n._id)} className='p-[6px]  rounded hover:shadow-lg hover:shadow-green-500/50'><MdDelete className='text-red-600 ' size={28} /></button>
                                             {
                                                 store?.userInfo?.role === 'writer' && <>
                                                     <Link to={`/dashboard/news/edit/${n._id}`} className='p-[6px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEdit /></Link>
-                                                    <div className='p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50'><FaTrash /></div>
+                                                    {/* <div className='p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50'><FaTrash /></div> */}
                                                 </>
                                             }
                                         </div>
                                     </td>
+                                    {/* <td className='px-6 py-4'>
+                                        <button onClick={() => delete_news(n._id)} className='p-[6px] bg-green-500 rounded hover:shadow-lg hover:shadow-green-500/50'><MdDelete /></button>
+                                    </td> */}
+
+
                                 </tr>
                             )
                         }
