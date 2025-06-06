@@ -9,6 +9,7 @@ import { ImProfile } from "react-icons/im";
 import { FaPlus } from "react-icons/fa";
 import storeContext from '../../context/storeContext'
 import { IoLogOutOutline } from "react-icons/io5";
+import { PiFlagBannerFoldBold } from "react-icons/pi";
 
 const Sidebar = () => {
     const navigate = useNavigate()
@@ -53,6 +54,13 @@ const Sidebar = () => {
                                 <span>Writers</span>
                             </Link>
                         </li>
+
+                        {/* <li>
+                            <Link to="/dashboard/createBanner" className={`px-3 ${pathname === "/dashboard/createBanner" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                                <span className='text-xl'><PiFlagBannerFoldBold /></span>
+                                <span>Banner</span>
+                            </Link>
+                        </li> */}
                     </> : <>
 
                         <li>

@@ -39,12 +39,10 @@ const Login = () => {
           token: data.token
         }
       })
-      console.log(data, "data")
-
+      
       if(data.success === true) {
         navigate('/dashboard')
       }
-      // navigate('/dashboard')
     } catch (error) {
       setLoder(false)
       tost.error(error.response.data.message)

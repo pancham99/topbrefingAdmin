@@ -54,7 +54,7 @@ const NewContent = () => {
 
             const response = await axios.delete(`${base_url}/api/news/delete/${news_id}`, {
                 headers: {
-                    Authorization: `Bearer ${store?.token}`,  
+                    Authorization: `Bearer ${store?.token}`,
                 },
             });
 
@@ -192,14 +192,15 @@ const NewContent = () => {
                 <select onChange={type_fillter_category} name='' className='lg:px-3 w-full  py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
 
                     <option value="">---select category--</option>
-                    <option value="Education">Education</option>
-                    <option value="Politics ">Politics </option>
-                    <option value="Health">Health</option>
-                    <option value="Inernational">Inernational</option>
-                    <option value="Sports">Sports</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Travel">Travel</option>
-                    <option value="Spiritual">Spiritual</option>
+                    <option value="शिक्षा">शिक्षा</option>
+                    <option value="राजनीति ">राजनीति </option>
+                    <option value="स्वास्थ्य">स्वास्थ्य</option>
+                    <option value="अंतरराष्ट्रीय">अंतरराष्ट्रीय</option>
+                    <option value="खेल">खेल</option>
+                    <option value="प्रौद्योगिकी">प्रौद्योगिकी</option>
+                    <option value="यात्रा">यात्रा</option>
+                    <option value="मनोरंजन">मनोरंजन</option>
+                    <option value="भक्ति">भक्ति</option>
                 </select>
 
 

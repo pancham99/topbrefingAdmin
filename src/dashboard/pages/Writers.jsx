@@ -65,8 +65,6 @@ const Writers = () => {
 
 
     const delete_writers = async (user_id) => {
-
-        console.log("Deleting news with ID:", user_id);
         try {
             if (!user_id) {
                 console.error("Invalid news ID");
@@ -78,7 +76,6 @@ const Writers = () => {
                     Authorization: `Bearer ${store?.token}`,
                 },
             });
-            console.log("Delete response:", response.data);
 
            get_writers()
         } catch (error) {
