@@ -19,10 +19,8 @@ const CreateNews = () => {
   const editor = useRef(null)
 
   const [title, setTitle] = useState('')
-  const [state, setState] = useState('')
   const [image, setImage] = useState('')
-
-  console.log(image, "image")
+  const [state, setState] = useState('')
   const [img, setImg] = useState('')
   const [description, setDescription] = useState('')
 
@@ -35,7 +33,13 @@ const CreateNews = () => {
 
   }
 
+  
+const handleStateChange = (e) => {
+  const selectedState = e.target.value;
+  setState(selectedState);
+
  
+};
 
   const [loader, setLoader] = useState(false)
 
@@ -46,6 +50,8 @@ const CreateNews = () => {
     formData.append('image', image)
     formData.append('state', state)
     formData.append('description', description)
+
+    console.log(formData, "formData")
 
     try {
       setLoader(true)
@@ -108,7 +114,7 @@ const CreateNews = () => {
       toast.success(data.message)
 
     } catch (error) {
-
+      
       setImageLoader(false)
       toast.error(error.response.data.message)
       console.log(error)
@@ -163,7 +169,8 @@ const CreateNews = () => {
                 />
               </div>
 
-              <div className='flex flex-col gap-y-2 mb-5'>
+
+               <div className='flex flex-col gap-y-2 mb-5'>
                 <label className='text-md font-medium text-gray-600' htmlFor='राज्य'>राज्य</label>
                 <select
                   name="state"
@@ -173,16 +180,16 @@ const CreateNews = () => {
                   required
                 >
                   <option value="">---राज्य चुनें---</option>
-                  <option value="BIHAR">बिहार</option>
-                  <option value="UP">उत्तर प्रदेश</option>
-                  <option value="DELHI">दिल्ली</option>
-                  <option value="MP">मध्य प्रदेश</option>
-                  <option value="RAJASTHAN">राजस्थान</option>
-                  <option value="MAHARASHTRA">महाराष्ट्र</option>
-                  <option value="GUJARAT">गुजरात</option>
-                  <option value="KARNATAKA">कर्नाटक</option>
-                  <option value="TAMIL NADU">तमिलनाडु</option>
-                  <option value="WEST BENGAL">पश्चिम बंगाल</option>
+                  <option value="बिहार">बिहार</option>
+                  <option value="उत्तर प्रदेश">उत्तर प्रदेश</option>
+                  <option value="दिल्ली">दिल्ली</option>
+                  <option value="मध्य प्रदेश">मध्य प्रदेश</option>
+                  <option value="राजस्थान">राजस्थान</option>
+                  <option value="महाराष्ट्र">महाराष्ट्र</option>
+                  <option value="गुजरात">गुजरात</option>
+                  <option value="कर्नाटक">कर्नाटक</option>
+                  <option value="तमिलनाडु">तमिलनाडु</option>
+                  <option value="पश्चिम बंगाल">पश्चिम बंगाल</option>
                 </select>
 
 
