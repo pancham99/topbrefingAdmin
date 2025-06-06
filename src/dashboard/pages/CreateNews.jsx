@@ -177,7 +177,7 @@ const handleStateChange = (e) => {
                   value={state}
                   onChange={handleStateChange}
                   className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10'
-                  required
+                 
                 >
                   <option value="">---राज्य चुनें---</option>
                   <option value="बिहार">बिहार</option>
