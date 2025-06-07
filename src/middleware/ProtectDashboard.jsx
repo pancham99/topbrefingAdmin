@@ -6,7 +6,7 @@ const ProtectDashboard = () => {
   const { store } = useContext(storeContext)
   console.log(store)
 
-  if (store.userInfo) {
+  if (store?.userInfo?.role === 'admin' || store?.userInfo?.role === 'writer') {
     return <Outlet />;
   } else {
     return <Navigate to="/login" />;
