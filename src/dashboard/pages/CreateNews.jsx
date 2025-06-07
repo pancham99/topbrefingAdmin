@@ -33,13 +33,13 @@ const CreateNews = () => {
 
   }
 
-  
-const handleStateChange = (e) => {
-  const selectedState = e.target.value;
-  setState(selectedState);
 
- 
-};
+  const handleStateChange = (e) => {
+    const selectedState = e.target.value;
+    setState(selectedState);
+
+
+  };
 
   const [loader, setLoader] = useState(false)
 
@@ -51,8 +51,6 @@ const handleStateChange = (e) => {
     formData.append('state', state)
     formData.append('description', description)
 
-    console.log(formData, "formData")
-
     try {
       setLoader(true)
       const { data } = await axios.post(`${base_url}/api/news/add`, formData, {
@@ -61,9 +59,8 @@ const handleStateChange = (e) => {
         }
       })
       setLoader(false)
-      console.log(data)
       toast.success(data.message)
-
+      navigate("/dashboard/news");
     } catch (error) {
       setLoader(false)
       toast.error(error.response.data.message)
@@ -95,7 +92,6 @@ const handleStateChange = (e) => {
   const imageHandler = async (e) => {
     e.preventDefault()
     const files = e.target.files
-    console.log(files, "files")
 
     try {
       const formData = new FormData()
@@ -112,9 +108,9 @@ const handleStateChange = (e) => {
       setImageLoader(false)
       setImages([...images, ...data.images])
       toast.success(data.message)
-
+      navigate("/dashboard/news");
     } catch (error) {
-      
+
       setImageLoader(false)
       toast.error(error.response.data.message)
       console.log(error)
@@ -170,14 +166,14 @@ const handleStateChange = (e) => {
               </div>
 
 
-               <div className='flex flex-col gap-y-2 mb-5'>
+              <div className='flex flex-col gap-y-2 mb-5'>
                 <label className='text-md font-medium text-gray-600' htmlFor='राज्य'>राज्य</label>
                 <select
                   name="state"
                   value={state}
                   onChange={handleStateChange}
                   className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10'
-                 
+
                 >
                   <option value="">---राज्य चुनें---</option>
                   <option value="बिहार">बिहार</option>

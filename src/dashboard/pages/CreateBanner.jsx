@@ -1,4 +1,4 @@
-
+import { base_url } from '../../config/config'
 import axios from "axios";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,10 +15,9 @@ const CreateBanner = () => {
     title: "",
     description: "",
     image: "",
-    link: "",
-    deviceType: "",
-    bannerType: "",
-    isActive: true,
+    device: "",
+    bannertype: "",
+    // isActive: true,
   });
 
   const [preview, setPreview] = useState(null);
@@ -30,33 +29,41 @@ const CreateBanner = () => {
     if (type === "file") {
       setFormData({ ...formData, image: files[0] });
       setPreview(URL.createObjectURL(files[0]));
-    } else if (type === "checkbox") {
-      setFormData({ ...formData, [name]: checked });
-    } else {
+    }  else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  const added = async (e) => {
-    e.preventDefault()
+const added = async (e) => {
+  e.preventDefault();
+  setLoader(true);
 
-    try {
-      setLoader(true)
-      const { data } = await axios.post(`http://localhost:5000/api/v1/banner/add`, formData, {
-        headers: {
-          'Authorization': `Bearer ${store.token}`
-        }
-      })
-      setLoader(false)
-      console.log(data)
-      toast.success(data.message)
+  try {
+    const fd = new FormData();
+    fd.append("title", formData.title);
+    fd.append("description", formData.description);
+    fd.append("image", formData.image); // file object
+    fd.append("device", formData.device);
+    fd.append("bannertype", formData.bannertype);
 
-    } catch (error) {
-      setLoader(false)
-      toast.error(error.response.data.message)
+    const { data } = await axios.post(`${base_url}/api/banner/add`, fd, {
+      headers: {
+        'Authorization': `Bearer ${store.token}`,
+        'Content-Type': 'multipart/form-data' // very important
+      }
+    });
 
-    }
+    setLoader(false);
+    toast.success(data.message);
+    navigate("/dashboard/banner"); 
+
+  } catch (error) {
+    setLoader(false);
+    console.error(error);
+    toast.error(error.response?.data?.message || 'Something went wrong');
   }
+};
+
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow rounded-md">
@@ -70,7 +77,7 @@ const CreateBanner = () => {
           value={formData.title}
           onChange={handleChange}
           className="w-full border rounded p-2"
-          required
+       
         />
 
         {/* Description */}
@@ -80,7 +87,7 @@ const CreateBanner = () => {
           value={formData.description}
           onChange={handleChange}
           className="w-full border rounded p-2"
-          required
+      
         />
 
         {/* Image Upload */}
@@ -94,27 +101,27 @@ const CreateBanner = () => {
               </div>
             }
           </label>
-          <input required onChange={handleChange} type='file'  accept="image/*"  name="image" id='img' className='hidden'/>
+          <input  onChange={handleChange} type='file'  accept="image/*"  name="image" id='img' className='hidden'/>
         </div>
       
 
         {/* Link */}
-        <input
+        {/* <input
           type="url"
           name="link"
           placeholder="https://example.com"
           value={formData.link}
           onChange={handleChange}
           className="w-full border rounded p-2"
-        />
+        /> */}
 
         {/* Device Type */}
         <select
-          name="deviceType"
-          value={formData.deviceType}
+          name="device"
+          value={formData.device}
           onChange={handleChange}
           className="w-full border rounded p-2"
-          required
+    
         >
           <option value="">Select Device Type</option>
           <option value="mobile">Mobile</option>
@@ -123,11 +130,11 @@ const CreateBanner = () => {
 
         {/* Banner Type */}
         <select
-          name="bannerType"
-          value={formData.bannerType}
+          name="bannertype"
+          value={formData.bannertype}
           onChange={handleChange}
           className="w-full border rounded p-2"
-          required
+       
         >
           <option value="">Select Banner Type</option>
           <option value="advertisement">advertisement</option>

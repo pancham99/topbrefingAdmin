@@ -16,6 +16,7 @@ import CreateNews from './dashboard/pages/CreateNews';
 import Edit_news from './dashboard/pages/Edit_news';
 import storeContext from './context/storeContext';
 import CreateBanner from './dashboard/pages/CreateBanner';
+import Banner from './dashboard/pages/Banner';
 
 function App() {
   const { store } = useContext(storeContext);
@@ -59,10 +60,11 @@ function App() {
               <Route path="admin" element={<AdminIndex />} />
               <Route path="writer/add" element={<AddWriter />} />
               <Route path="writers" element={<Writers />} />
-                <Route path="createBanner" element={<CreateBanner />} />
+              <Route path="createBanner" element={<CreateBanner />} />
+              <Route path="banner" element={<Banner />} />
 
 
-              
+
             </Route>
 
             {/* ✅ Writer Routes */}
