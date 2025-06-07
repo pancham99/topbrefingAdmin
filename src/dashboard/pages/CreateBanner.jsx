@@ -86,7 +86,7 @@ const CreateBanner = () => {
           value={formData.title}
           onChange={handleChange}
           className="w-full border rounded p-2"
-
+          required
         />
 
         {/* Description */}
@@ -96,7 +96,7 @@ const CreateBanner = () => {
           value={formData.description}
           onChange={handleChange}
           className="w-full border rounded p-2"
-
+          required
         />
 
         {/* Image Upload */}
@@ -110,7 +110,7 @@ const CreateBanner = () => {
               </div>
             }
           </label>
-          <input onChange={handleChange} type='file' accept="image/*" name="image" id='img' className='hidden' />
+          <input required onChange={handleChange} type='file' accept="image/*" name="image" id='img' className='hidden' />
         </div>
 
 
