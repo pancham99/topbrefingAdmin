@@ -37,7 +37,7 @@ const DisplayCartItem = ({ close }) => {
 
                 <div className='min-h-[75vh] lg:min-h-[80vh] w-full h-full  bg-blue-50 p-2 flex flex-col'>
 
-                    <div className='  lg:hidden'>
+                    <div className='lg:hidden'>
                         <div className='py-2 flex justify-center items-center'>
                             <Link to="/">
                                 <h1><span className='text-sm text-slate-400 font-semibold'>Top</span><span className='text-sky-400'>Briefing</span></h1>
@@ -70,14 +70,14 @@ const DisplayCartItem = ({ close }) => {
 
 
                                     <li>
-                                        <Link to="/dashboard/createBanner" className={`px-3 ${pathname === "/dashboard/createBanner" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                                        <Link to="/dashboard/createBanner" onClick={close} className={`px-3 ${pathname === "/dashboard/createBanner" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
                                             <span className='text-xl'><AiOutlinePlus /></span>
                                             <span>Add Banner</span>
                                         </Link>
                                     </li>
 
                                     <li>
-                                        <Link to="/dashboard/banner" className={`px-3 ${pathname === "/dashboard/banner" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                                        <Link to="/dashboard/banner" onClick={close} className={`px-3 ${pathname === "/dashboard/banner" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
                                             <span className='text-xl'><PiFlagBannerFoldBold /></span>
                                             <span>Banner</span>
                                         </Link>
