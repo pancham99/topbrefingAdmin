@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import {useContext } from 'react'
 
 import storeContext from '../../context/storeContext'
-import VideoContent from '../components/videoContent'
+import VideoContent from '../components/VideoContents'
 
 const Videos = () => {
     const { store } = useContext(storeContext)

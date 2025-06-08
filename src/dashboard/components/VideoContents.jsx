@@ -8,7 +8,7 @@ import { MdDelete } from "react-icons/md";
 import { useContext, useEffect, useState } from 'react'
 
 
-const VideoContent = () => {
+const VideoContents = () => {
     const { store } = useContext(storeContext)
     const [video, setVideo] = useState([])
 
@@ -157,4 +157,4 @@ const VideoContent = () => {
     )
 }
 
-export default VideoContent
+export default VideoContents
