@@ -5,7 +5,7 @@ import {useContext } from 'react'
 import storeContext from '../../context/storeContext'
 import VideoContent from '../components/videoContent'
 
-const Video = () => {
+const Videos = () => {
     const { store } = useContext(storeContext)
 
     return (
@@ -24,4 +24,4 @@ const Video = () => {
     )
 }
 
-export default Video
+export default Videos
