@@ -17,6 +17,8 @@ import Edit_news from './dashboard/pages/Edit_news';
 import storeContext from './context/storeContext';
 import CreateBanner from './dashboard/pages/CreateBanner';
 import Banner from './dashboard/pages/Banner';
+import AddVideoContent from './dashboard/pages/AddVideoContent';
+import Video from './dashboard/pages/video';
 
 function App() {
   const { store } = useContext(storeContext);
@@ -62,9 +64,8 @@ function App() {
               <Route path="writers" element={<Writers />} />
               <Route path="createBanner" element={<CreateBanner />} />
               <Route path="banner" element={<Banner />} />
-
-
-
+              <Route path="addVideoContent" element={<AddVideoContent />} />
+              <Route path="video" element={<Video />} />
             </Route>
 
             {/* ✅ Writer Routes */}

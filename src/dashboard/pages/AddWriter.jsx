@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 
 const AddWriter = () => {
   const navigate = useNavigate()
-  const {store} = useContext(storeContext)
+  const { store } = useContext(storeContext)
 
   const [state, setState] = useState({
     name: '',
@@ -26,11 +26,11 @@ const AddWriter = () => {
 
   const [loader, setLoader] = useState(false)
 
-  const submit = async(e) => {
+  const submit = async (e) => {
     e.preventDefault()
     try {
       setLoader(true)
-      const {data} = await axios.post(`${base_url}/api/news/writer/add`, state,{
+      const { data } = await axios.post(`${base_url}/api/news/writer/add`, state, {
         headers: {
           'Authorization': `Bearer ${store.token}`
         }
@@ -42,8 +42,8 @@ const AddWriter = () => {
 
     } catch (error) {
       setLoader(false)
-     toast.error(error.response.data.message)
-     console.log(error)
+      toast.error(error.response.data.message)
+      console.log(error)
     }
   }
 
@@ -76,6 +76,7 @@ const AddWriter = () => {
                 <option value="यात्रा">यात्रा</option>
                 <option value="मनोरंजन">मनोरंजन</option>
                 <option value="भक्ति">भक्ति</option>
+                <option value="लाइफस्टाइल">लाइफस्टाइल</option>
               </select>
             </div>
 
@@ -92,7 +93,7 @@ const AddWriter = () => {
             </div>
           </div>
           <div className='mt-2'>
-            <button disabled={loader} className='px-3 py-[6px] bg-purple-500 rounded-md text-white hover:bg-purple-600' to='/dashboard/writers'>{loader ? "Loading..": "Add Writers"}</button>
+            <button disabled={loader} className='px-3 py-[6px] bg-purple-500 rounded-md text-white hover:bg-purple-600' to='/dashboard/writers'>{loader ? "Loading.." : "Add Writers"}</button>
           </div>
         </form>
       </div>
