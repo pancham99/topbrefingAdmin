@@ -1,15 +1,11 @@
-import React, { useRef, useContext, useState, useEffect } from 'react'
-import { FaEye } from "react-icons/fa";
-import { FaEdit } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
-import { Link, useLocation } from 'react-router-dom'
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+
 import axios from 'axios'
 import { base_url } from '../../config/config'
 import storeContext from '../../context/storeContext'
 import { convert } from 'html-to-text'
 import toast from 'react-hot-toast'
 import { MdDelete } from "react-icons/md";
+import { useContext, useEffect, useState } from 'react'
 
 
 const VideoContent = () => {
@@ -32,11 +28,6 @@ const VideoContent = () => {
             console.log(error.message)
         }
     }
-
-
-
-
-
 
     const [res, setRes] = useState({
         id: '',
@@ -131,7 +122,7 @@ const VideoContent = () => {
                                     </td>
                                     <td className='px-6 py-4'>{n.videotype}</td>
                                     <td className='px-6 py-4'>
-                                        {/* <span className='px-2 py-[2px] bg-blue-100 text-blue-800 rounded-lg text-xs cursor-pointer'>{n.status}</span> */}
+                                       
 
 
                                         {

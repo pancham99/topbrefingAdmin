@@ -1,9 +1,8 @@
-import React, { useRef, useContext, useState, useEffect } from 'react'
+
 import { Link } from "react-router-dom"
-import NewContent from '../components/NewContent'
+import {useContext } from 'react'
 
 import storeContext from '../../context/storeContext'
-import BannerContent from '../components/BannerContent'
 import VideoContent from '../components/videoContent'
 
 const Video = () => {
