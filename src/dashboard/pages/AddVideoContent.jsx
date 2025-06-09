@@ -6,97 +6,104 @@ import storeContext from "../../context/storeContext";
 import { MdCloudUpload } from "react-icons/md";
 import toast from 'react-hot-toast'
 
-const AddVideoContent = () => {
+const CLOUD_NAME = "donkxeytk";
+const UPLOAD_PRESET = "ml_default"; // Make sure this preset exists and is unsigned
 
-  const navigate = useNavigate()
-  const { store } = useContext(storeContext)
-  const [loader, setLoader] = useState(false)
+const AddVideoContent = () => {
+  const navigate = useNavigate();
+  const { store } = useContext(storeContext);
+  const [loader, setLoader] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     videos: "",
     videotype: "",
-    // videourl: "",
   });
 
-  console.log(formData, "formData");
   const [videoPreview, setVideoPreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
-    const handleChange = async (e) => {
+  const handleChange = async (e) => {
     const { name, value, type, files } = e.target;
 
     if (type === "file" && name === "videos") {
       const file = files[0];
+      if (!file) return;
       setVideoPreview(URL.createObjectURL(file));
       setUploading(true);
 
       try {
         const cloudData = new FormData();
         cloudData.append("file", file);
-        cloudData.append("upload_preset", "video_uploads"); // 🔁 Replace
-        cloudData.append("cloud_name", "donkxeytk"); // 🔁 Replace
-        cloudData.append("resource_type", "video");
+        cloudData.append("upload_preset", UPLOAD_PRESET);
 
         const res = await axios.post(
-          "https://api.cloudinary.com/v1_1/donkxeytk/video/upload", // 🔁 Replace
+          `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`,
           cloudData
         );
 
-        setFormData({ ...formData, videos: res.data.secure_url });
-        toast.success("Video uploaded successfully");
+        if (res.data && res.data.secure_url) {
+          setFormData((prev) => ({ ...prev, videos: res.data.secure_url }));
+          toast.success("Video uploaded successfully");
+        } else {
+          throw new Error("No secure_url returned from Cloudinary");
+        }
       } catch (error) {
         console.error("Upload error:", error);
-        toast.error("Failed to upload video");
+        toast.error(
+          error.response?.data?.error?.message ||
+          error.message ||
+          "Failed to upload video"
+        );
+        setFormData((prev) => ({ ...prev, videos: "" }));
       } finally {
         setUploading(false);
       }
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-  // const handleChange = (e) => {
-  //   const { name, value, type, files } = e.target;
-
-  //   if (type === "file") {
-
-  //     if (name === "videos") {
-  //       setFormData({ ...formData, videos: files[0] });
-  //       setVideoPreview(URL.createObjectURL(files[0]));
-  //     }
-  //   } else {
-  //     setFormData({ ...formData, [name]: value });
-  //   }
-  // };
-
   const added = async (e) => {
     e.preventDefault();
+
+    if (uploading) {
+      toast.error("Please wait for the video to finish uploading.");
+      return;
+    }
+    if (videoPreview && !formData.videos) {
+      toast.error("Please wait for the video to finish uploading.");
+      return;
+    }
+    if (!formData.title || !formData.videotype) {
+      toast.error("Please fill all required fields.");
+      return;
+    }
     setLoader(true);
 
     try {
-      const fd = new FormData();
-      fd.append("title", formData.title);
-      fd.append("videos", formData.videos);
-      // fd.append("videourl", formData.videourl);
-      fd.append("videotype", formData.videotype);
+      // Send as JSON, not FormData
+      const payload = {
+        title: formData.title,
+        videos: formData.videos, // This is the Cloudinary URL
+        videotype: formData.videotype
+      };
 
-      const { data } = await axios.post(`${base_url}/api/video/add`, fd, {
+      const { data } = await axios.post(`${base_url}/api/video/add`, payload, {
         headers: {
           'Authorization': `Bearer ${store.token}`,
-          'Content-Type': 'multipart/form-data' // very important
+          'Content-Type': 'application/json'
         }
       });
 
       setLoader(false);
       toast.success(data.message);
       navigate("/dashboard/video");
-
     } catch (error) {
       setLoader(false);
       console.error(error);
       toast.error(error.response?.data?.message || 'Something went wrong');
     }
   };
-
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow rounded-md">
@@ -113,11 +120,9 @@ const AddVideoContent = () => {
           required
         />
 
-
-
         {/* Video Upload */}
         <div className='mb-6'>
-          <label className={`w-full h-[180px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed `} htmlFor='video'>
+          <label className={`w-full h-[180px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed`} htmlFor='video'>
             {
               videoPreview ? (
                 <video src={videoPreview} controls className='h-full w-full' />
@@ -132,29 +137,36 @@ const AddVideoContent = () => {
           <input onChange={handleChange} type='file' accept="video/*" name="videos" id='video' className='hidden' />
         </div>
 
-
         {/* Banner Type */}
         <select
           name="videotype"
           value={formData.videotype}
           onChange={handleChange}
           className="w-full border rounded p-2"
-
+          required
         >
           <option value="">Select Banner Type</option>
           <option value="advertisement">advertisement</option>
           <option value="announcement">announcement</option>
           <option value="promotion">promotion</option>
-          <option value="custom">custom</option>
+          <option value="news">news</option>
         </select>
 
         {/* Submit */}
         <button
-
-          disabled={loader}
+          type="submit"
+          disabled={
+            loader ||
+            uploading ||
+            (videoPreview && !formData.videos)
+          }
           className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          {loader ? "Submitting..." : "Add Banner"}
+          {loader
+            ? "Submitting..."
+            : uploading
+              ? "Uploading Video..."
+              : "Add Banner"}
         </button>
       </form>
     </div>

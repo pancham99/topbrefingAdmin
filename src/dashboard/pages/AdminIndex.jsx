@@ -10,7 +10,7 @@ import axios from 'axios';
 const AdminIndex = () => {
    const { store } = useContext(storeContext)
    const [all_news, set_all_news] = useState([])
-   console.log(all_news, "hhall_newsh")
+  
 
       const get_news = async () => {
           try {
@@ -22,8 +22,6 @@ const AdminIndex = () => {
   
               set_all_news(data.news)
               
-  
-              console.log(data)
           } catch (error) {
               console.log(error.message)
           }

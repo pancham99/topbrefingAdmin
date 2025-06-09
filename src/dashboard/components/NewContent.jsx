@@ -45,7 +45,6 @@ const NewContent = () => {
 
     const delete_news = async (news_id) => {
 
-        console.log("Deleting news with ID:", news_id);
         try {
             if (!news_id) {
                 console.error("Invalid news ID");
