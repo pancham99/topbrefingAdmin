@@ -85,14 +85,14 @@ const DisplayCartItem = ({ close }) => {
                                     </li>
 
                                     <li>
-                                        <Link to="/dashboard/addVideoContent" className={`px-3 ${pathname === "/dashboard/addVideoContent" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                                        <Link to="/dashboard/addVideoContent" onClick={close} className={`px-3 ${pathname === "/dashboard/addVideoContent" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
                                             <span className='text-xl'><AiOutlinePlus /></span>
                                             <span>Add Video</span>
                                         </Link>
                                     </li>
 
                                     <li>
-                                        <Link to="/dashboard/video" className={`px-3 ${pathname === "/dashboard/video" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                                        <Link to="/dashboard/video" onClick={close} className={`px-3 ${pathname === "/dashboard/video" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
                                             <span className='text-xl'><IoIosVideocam /></span>
                                             <span>Video</span>
                                         </Link>

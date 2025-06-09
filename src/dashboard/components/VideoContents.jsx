@@ -12,7 +12,7 @@ const VideoContents = () => {
     const { store } = useContext(storeContext)
     const [video, setVideo] = useState([])
 
-    console.log(video, "video")
+    // console.log(video, "video")
 
 
     const get_video = async () => {
@@ -23,7 +23,7 @@ const VideoContents = () => {
                 }
             })
             setVideo(data?.data || []);
-            console.log(data.banners)
+            // console.log(data.data, "video data")
         } catch (error) {
             console.log(error.message)
         }
