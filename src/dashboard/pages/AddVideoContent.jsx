@@ -21,19 +21,52 @@ const AddVideoContent = () => {
   console.log(formData, "formData");
   const [videoPreview, setVideoPreview] = useState(null);
 
-  const handleChange = (e) => {
+    const handleChange = async (e) => {
     const { name, value, type, files } = e.target;
 
-    if (type === "file") {
+    if (type === "file" && name === "videos") {
+      const file = files[0];
+      setVideoPreview(URL.createObjectURL(file));
+      setUploading(true);
 
-      if (name === "videos") {
-        setFormData({ ...formData, videos: files[0] });
-        setVideoPreview(URL.createObjectURL(files[0]));
+      try {
+        const cloudData = new FormData();
+        cloudData.append("file", file);
+        cloudData.append("upload_preset", "video_uploads"); // 🔁 Replace
+        cloudData.append("cloud_name", "donkxeytk"); // 🔁 Replace
+        cloudData.append("resource_type", "video");
+
+        const res = await axios.post(
+          "https://api.cloudinary.com/v1_1/donkxeytk/video/upload", // 🔁 Replace
+          cloudData
+        );
+
+        setFormData({ ...formData, videos: res.data.secure_url });
+        toast.success("Video uploaded successfully");
+      } catch (error) {
+        console.error("Upload error:", error);
+        toast.error("Failed to upload video");
+      } finally {
+        setUploading(false);
       }
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
+
+  // const handleChange = (e) => {
+  //   const { name, value, type, files } = e.target;
+
+  //   if (type === "file") {
+
+  //     if (name === "videos") {
+  //       setFormData({ ...formData, videos: files[0] });
+  //       setVideoPreview(URL.createObjectURL(files[0]));
+  //     }
+  //   } else {
+  //     setFormData({ ...formData, [name]: value });
+  //   }
+  // };
 
   const added = async (e) => {
     e.preventDefault();
@@ -99,16 +132,6 @@ const AddVideoContent = () => {
           <input onChange={handleChange} type='file' accept="video/*" name="videos" id='video' className='hidden' />
         </div>
 
-
-        {/* Link */}
-        {/* <input
-          type="url"
-          name="videourl"
-          placeholder="https://example.com"
-          value={formData.videourl}
-          onChange={handleChange}
-          className="w-full border rounded p-2"
-        /> */}
 
         {/* Banner Type */}
         <select
