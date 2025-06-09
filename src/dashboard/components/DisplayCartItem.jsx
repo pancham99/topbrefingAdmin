@@ -12,6 +12,7 @@ import { FaPlus } from "react-icons/fa";
 import storeContext from '../../context/storeContext'
 import { IoLogOutOutline } from "react-icons/io5";
 import { PiFlagBannerFoldBold } from 'react-icons/pi';
+import { IoIosVideocam } from 'react-icons/io';
 
 const DisplayCartItem = ({ close }) => {
     const navigate = useNavigate()
@@ -26,7 +27,7 @@ const DisplayCartItem = ({ close }) => {
     }
     return (
         <section className='bg-neutral-900 fixed top-0 bottom-0 right-0 left-0 bg-opacity-70 z-50'>
-            <div className='bg-white w-36 max-w-sm min-h-screen max-h-screen ml-auto'>
+            <div className='bg-white w-48 max-w-sm min-h-screen max-h-screen ml-auto'>
                 <div className='flex items-center shadow-md px-2 justify-between'>
                     <img className='w-12 h-12 bg-contain rounded-full' src='https://img.freepik.com/premium-vector/account-icon-user-icon-vector-graphics_292645-552.jpg' alt='' />
 
@@ -38,9 +39,9 @@ const DisplayCartItem = ({ close }) => {
                 <div className='min-h-[75vh] lg:min-h-[80vh] w-full h-full  bg-blue-50 p-2 flex flex-col'>
 
                     <div className='lg:hidden'>
-                        <div className='py-2 flex justify-center items-center'>
+                        <div className='py-2 flex justify-center items-center bg-red-500 text-white rounded-md mb-2 font-extrabold'>
                             <Link to="/">
-                                <h1><span className='text-sm text-slate-400 font-semibold'>Top</span><span className='text-sky-400'>Briefing</span></h1>
+                                <h1><span className='text-sm  font-extrabold'>Top</span><span className='text-white font-extrabold'>Briefing</span></h1>
                             </Link>
                         </div>
 
@@ -80,6 +81,20 @@ const DisplayCartItem = ({ close }) => {
                                         <Link to="/dashboard/banner" onClick={close} className={`px-3 ${pathname === "/dashboard/banner" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
                                             <span className='text-xl'><PiFlagBannerFoldBold /></span>
                                             <span>Banner</span>
+                                        </Link>
+                                    </li>
+
+                                    <li>
+                                        <Link to="/dashboard/addVideoContent" className={`px-3 ${pathname === "/dashboard/addVideoContent" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                                            <span className='text-xl'><AiOutlinePlus /></span>
+                                            <span>Add Video</span>
+                                        </Link>
+                                    </li>
+
+                                    <li>
+                                        <Link to="/dashboard/video" className={`px-3 ${pathname === "/dashboard/video" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                                            <span className='text-xl'><IoIosVideocam /></span>
+                                            <span>Video</span>
                                         </Link>
                                     </li>
                                 </> : <>
