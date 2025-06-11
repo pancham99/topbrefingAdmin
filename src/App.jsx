@@ -67,6 +67,8 @@ function App() {
               <Route path="banner" element={<Banner />} />
               <Route path="addVideoContent" element={<AddVideoContent />} />
               <Route path="video" element={<Videos/>} />
+
+
             </Route>
 
             {/* ✅ Writer Routes */}

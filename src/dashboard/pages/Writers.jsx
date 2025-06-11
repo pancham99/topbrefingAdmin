@@ -11,8 +11,6 @@ const Writers = () => {
     const { store } = useContext(storeContext)
     const [writers, setWriters] = useState([])
 
-    console.log(writers, 'writers')
-
     const get_writers = async () => {
         try {
 

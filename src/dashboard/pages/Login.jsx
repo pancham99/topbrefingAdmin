@@ -30,6 +30,7 @@ const Login = () => {
     try {
       setLoder(true)
       const { data } = await axios.post(`${base_url}/api/login`, state)
+      console.log(data, "data")
       setLoder(false)
       localStorage.setItem('newstoken', data.token)
       tost.success(data.message)
