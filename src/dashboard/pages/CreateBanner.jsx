@@ -189,7 +189,7 @@ const CreateBanner = () => {
         <button
 
           disabled={loader}
-          className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
         >
           {loader ? "Submitting..." : "Add Banner"}
         </button>

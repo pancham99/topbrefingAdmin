@@ -28,7 +28,11 @@ const Sidebar = () => {
         <div className='w-[250px] h-screen fixed left-0 top-0 bg-white hidden lg:block'>
             <div className='h-[70px] flex justify-center items-center'>
                 <Link to="/">
-                    <h1><span className='text-3xl text-slate-400 font-semibold'>Top</span><span className='text-sky-400'>Briefing</span></h1>
+
+                    <div className="flex flex-col justify-center items-center md:items-start mt-8">
+                        <img src="/logo.png" alt="bgimage" className='w-36 h-28 bg-contain'/>
+                    </div>
+                    {/* <h1><span className='text-3xl text-red-600 font-semibold'>Top</span><span className='text-red-400'>Briefing</span></h1> */}
                 </Link>
             </div>
 
@@ -36,51 +40,51 @@ const Sidebar = () => {
                 {
                     store.userInfo?.role === 'admin' ? <>
                         <li>
-                            <Link to="/dashboard/admin" className={`px-3 ${pathname === "/dashboard/admin" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/admin" className={`px-3 ${pathname === "/dashboard/admin" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><AiFillDashboard /></span>
                                 <span>Dashbord</span>
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/dashboard/writer/add" className={`px-3 ${pathname === "/dashboard/writer/add" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/writer/add" className={`px-3 ${pathname === "/dashboard/writer/add" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><AiOutlinePlus /></span>
                                 <span>Add writer</span>
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/dashboard/writers" className={`px-3 ${pathname === "/dashboard/writers" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/writers" className={`px-3 ${pathname === "/dashboard/writers" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><FiUsers /></span>
                                 <span>Writers</span>
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/dashboard/createBanner" className={`px-3 ${pathname === "/dashboard/createBanner" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/createBanner" className={`px-3 ${pathname === "/dashboard/createBanner" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><AiOutlinePlus /></span>
                                 <span>Add Banner</span>
                             </Link>
                         </li>
 
-                        
+
 
                         <li>
-                            <Link to="/dashboard/banner" className={`px-3 ${pathname === "/dashboard/banner" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/banner" className={`px-3 ${pathname === "/dashboard/banner" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><PiFlagBannerFoldBold /></span>
                                 <span>Banner</span>
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/dashboard/addVideoContent" className={`px-3 ${pathname === "/dashboard/addVideoContent" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/addVideoContent" className={`px-3 ${pathname === "/dashboard/addVideoContent" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><AiOutlinePlus /></span>
                                 <span>Add Video</span>
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/dashboard/video" className={`px-3 ${pathname === "/dashboard/video" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/video" className={`px-3 ${pathname === "/dashboard/video" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><IoIosVideocam /></span>
                                 <span>Video</span>
                             </Link>
@@ -88,13 +92,13 @@ const Sidebar = () => {
                     </> : <>
 
                         <li>
-                            <Link to="/dashboard/writer" className={`px-3 ${pathname === "/dashboard/writer" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/writer" className={`px-3 ${pathname === "/dashboard/writer" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><AiFillDashboard /></span>
                                 <span>Dashbord</span>
                             </Link>
                         </li>
                         <li>
-                            <Link to="/dashboard/news/create" className={`px-3 ${pathname === "/dashboard/news/create" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                            <Link to="/dashboard/news/create" className={`px-3 ${pathname === "/dashboard/news/create" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><FaPlus /></span>
                                 <span>Add News</span>
                             </Link>
@@ -105,7 +109,7 @@ const Sidebar = () => {
 
 
                 <li>
-                    <Link to="/dashboard/news" className={`px-3 ${pathname === "/dashboard/news" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                    <Link to="/dashboard/news" className={`px-3 ${pathname === "/dashboard/news" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                         <span className='text-xl'><BiNews /></span>
                         <span>News</span>
                     </Link>
@@ -114,7 +118,7 @@ const Sidebar = () => {
 
 
                 <li>
-                    <Link to="/dashboard/profile" className={`px-3 ${pathname === "/dashboard/profile" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
+                    <Link to="/dashboard/profile" className={`px-3 ${pathname === "/dashboard/profile" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                         <span className='text-xl'><ImProfile /></span>
                         <span>Profile</span>
                     </Link>

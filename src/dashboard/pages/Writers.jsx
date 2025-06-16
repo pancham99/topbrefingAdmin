@@ -87,7 +87,7 @@ const Writers = () => {
         <div className='bg-white rounded-md'>
             <div className='flex justify-between p-4'>
                 <h2 className='text-xl font-medium'>Writers</h2>
-                <Link className='px-3 py-[6px] bg-purple-500 rounded-md text-white hover:bg-purple-600' to='/dashboard/writer/add'>Add Writer</Link>
+                <Link className='px-3 py-[6px] bg-red-500 rounded-md text-white hover:bg-red-600' to='/dashboard/writer/add'>Add Writer</Link>
             </div>
 
             <div className='relative overflow-x-auto p-4'>

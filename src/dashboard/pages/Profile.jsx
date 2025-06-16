@@ -175,7 +175,7 @@ const Profile = () => {
             <button
               type="submit"
               disabled={loader === "avatar"}
-              className="px-3 py-[6px] bg-purple-500 rounded-md text-white hover:bg-purple-600"
+              className="px-3 py-[6px] bg-red-500 rounded-md text-white hover:bg-red-600"
             >
               {loader === "avatar" ? "Loading..." : "Update Avatar"}
             </button>
@@ -235,7 +235,7 @@ const Profile = () => {
               <button
                 disabled={loader === "password"}
                 type="submit"
-                className="px-3 py-[6px] bg-purple-500 rounded-md text-white hover:bg-purple-600"
+                className="px-3 py-[6px] bg-red-500 rounded-md text-white hover:bg-red-600"
                 to="/dashboard/writers"
               >
                 {loader === "password" ? "Loading..." : "Change Password"}
