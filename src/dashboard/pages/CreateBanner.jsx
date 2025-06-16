@@ -169,6 +169,7 @@ const CreateBanner = () => {
           <option value="announcement">announcement</option>
           <option value="promotion">promotion</option>
           <option value="custom">custom</option>
+          <option value="Banner">Banner</option>
 
 
         </select>

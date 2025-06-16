@@ -12,14 +12,14 @@ import toast from 'react-hot-toast'
 import { MdDelete } from "react-icons/md";
 
 
-const NewContent = () => {
+const DeactiveNewContent = () => {
 
     const { store } = useContext(storeContext)
     const [news, setNews] = useState([])
     const [all_news, set_all_news] = useState([])
     const [writers, setWriters] = useState([])
 
-    const [parPage, setPerPage] = useState(10)
+    const [parPage, setPerPage] = useState(5)
     const [pages, setPages] = useState(0)
     const [page, setPage] = useState(1)
 
@@ -40,6 +40,9 @@ const NewContent = () => {
             console.log(error.message)
         }
     }
+
+    const Deactives = all_news.filter(n => n.status === 'deactive')
+    console.log(Deactives, "Deactives")
 
 
 
@@ -102,7 +105,7 @@ const NewContent = () => {
 
     const type_fillter = (e) => {
         if (e.target.value === '') {
-            setNews(all_news)
+            setNews(Deactives)
             setPage(1)
             setPerPage(5)
         } else {
@@ -114,16 +117,15 @@ const NewContent = () => {
     }
 
     const type_fillter_category = (e) => {
-        console.log(e.target.value)
         if (e.target.value === '') {
             setNews(all_news)
             setPage(1)
-            setPerPage(10)
+            setPerPage(5)
         } else {
             const tempNews = all_news.filter(n => n.category === e.target.value)
             setNews(tempNews)
             setPage(1)
-            setPerPage(10)
+            setPerPage(5)
         }
     }
 
@@ -193,7 +195,7 @@ const NewContent = () => {
 
                     <option value="">---select category--</option>
                     <option value="शिक्षा">शिक्षा</option>
-                    <option value="राजनीति">राजनीति </option>
+                    <option value="राजनीति ">राजनीति </option>
                     <option value="स्वास्थ्य">स्वास्थ्य</option>
                     <option value="अंतरराष्ट्रीय">अंतरराष्ट्रीय</option>
                     <option value="खेल">खेल</option>
@@ -201,8 +203,6 @@ const NewContent = () => {
                     <option value="यात्रा">यात्रा</option>
                     <option value="मनोरंजन">मनोरंजन</option>
                     <option value="भक्ति">भक्ति</option>
-                    <option value="लाइफस्टाइल">लाइफस्टाइल</option>
-                    <option value="अपराध">अपराध</option>
                 </select>
 
 
@@ -230,7 +230,7 @@ const NewContent = () => {
                     </thead>
                     <tbody>
                         {
-                            news.length > 0 && news.slice((page - 1) * parPage, page * parPage).map((n, i) =>
+                            Deactives.length > 0 && Deactives.map((n, i) =>
                                 <tr key={i} className='bg-white border-b'>
                                     <td className='px-6 py-4'>{i + 1}</td>
                                     <td className='px-6 py-4'>{n.title.slice(0, 15)}...</td>
@@ -303,16 +303,10 @@ const NewContent = () => {
 
 
                     }} name='category' id='category' type='text' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10'>
+                        <option value="5">5</option>
                         <option value="10">10</option>
+                        <option value="15 ">15 </option>
                         <option value="20">20</option>
-                        <option value="30">30 </option>
-                        <option value="40">40</option>
-                        <option value="50">50</option>
-                        <option value="60">60</option>
-                        <option value="70">70</option>
-                        <option value="80">80</option>
-                        <option value="90">90</option>
-                        <option value="100">100</option>
                     </select>
                 </div>
                 <p className='px-6 py-3 font-semibold text-sm'>{(page - 1) * parPage + 1}/{news.length} - of {pages}</p>
@@ -336,4 +330,4 @@ const NewContent = () => {
     )
 }
 
-export default NewContent
+export default DeactiveNewContent

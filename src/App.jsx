@@ -19,6 +19,7 @@ import CreateBanner from './dashboard/pages/CreateBanner';
 import Banner from './dashboard/pages/Banner';
 import AddVideoContent from './dashboard/pages/AddVideoContent';
 import Videos from './dashboard/pages/Videos';
+import Deactive from './dashboard/pages/Deactive';
 
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
               <Route path="banner" element={<Banner />} />
               <Route path="addVideoContent" element={<AddVideoContent />} />
               <Route path="video" element={<Videos/>} />
+               <Route path="deactive" element={<Deactive/>} />
 
 
             </Route>

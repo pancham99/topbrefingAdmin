@@ -63,7 +63,7 @@ const DashboardGraph = () => {
   return (
     <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-10">
       {/* News Chart */}
-      <div className="bg-white p-5 rounded shadow">
+      <div className="bg-white p-5 rounded  shadow-md border">
         <h2 className="text-xl font-bold mb-5">News Status</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
@@ -87,7 +87,7 @@ const DashboardGraph = () => {
       </div>
 
       {/* Writer Chart */}
-      <div className="bg-white p-5 rounded shadow">
+      <div className="bg-white p-5 rounded shadow-md border">
         <h2 className="text-xl font-bold mb-5">Writers Status</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
