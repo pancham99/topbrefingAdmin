@@ -18,7 +18,7 @@ const CreateBanner = () => {
     // videos: "",
     device: "",
     bannertype: "",
-    // isActive: true,
+    day: "",
   });
 
   console.log(formData, "formData");
@@ -33,7 +33,7 @@ const CreateBanner = () => {
       if (name === "image") {
         setFormData({ ...formData, image: files[0] });
         setPreview(URL.createObjectURL(files[0]));
-      } 
+      }
       // else if (name === "videos") {
       //   setFormData({ ...formData, videos: files[0] });
       //   setVideoPreview(URL.createObjectURL(files[0]));
@@ -55,6 +55,7 @@ const CreateBanner = () => {
       // fd.append("videos", formData.videos);
       fd.append("device", formData.device);
       fd.append("bannertype", formData.bannertype);
+      fd.append("day", formData.day);
 
       const { data } = await axios.post(`${base_url}/api/banner/add`, fd, {
         headers: {
@@ -170,20 +171,25 @@ const CreateBanner = () => {
           <option value="promotion">promotion</option>
           <option value="custom">custom</option>
           <option value="Banner">Banner</option>
-
-
         </select>
 
-        {/* Active Checkbox */}
-        {/* <label className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            name="isActive"
-            checked={formData.isActive}
-            onChange={handleChange}
-          />
-          <span>Active</span>
-        </label> */}
+
+        {/* ✅ Show Add Day Option Conditionally */}
+        {["advertisement", "announcement", "promotion", "custom"].includes(formData.bannertype) && (
+          <div>
+            <label htmlFor="day" className="block mt-4 mb-1 font-medium">Add Day</label>
+            <input
+              type="number"
+              id="day"
+              name="day"
+              placeholder="Enter number of days"
+              value={formData.day || ""}
+              onChange={handleChange}
+              className="w-full border rounded p-2"
+              min={1}
+            />
+          </div>
+        )}
 
         {/* Submit */}
         <button

@@ -78,6 +78,9 @@ const AddWriter = () => {
                 <option value="भक्ति">भक्ति</option>
                 <option value="लाइफस्टाइल">लाइफस्टाइल</option>
                 <option value="अपराध">अपराध</option>
+                <option value="मौसम">मौसम</option>
+
+                
 
                 
               </select>
