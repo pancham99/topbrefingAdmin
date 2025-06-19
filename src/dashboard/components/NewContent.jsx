@@ -271,10 +271,14 @@ const NewContent = () => {
                                     }
                                     <td className='px-6 py-4'>
                                         <div className='px-6 py-4'>
-                                            <button onClick={() => delete_news(n._id)} className='p-[6px]  rounded hover:shadow-lg hover:shadow-green-500/50'><MdDelete className='text-red-600 ' size={28} /></button>
+                                           {
+                                                store?.userInfo?.role === 'admin' && <>
+                                                 <button onClick={() => delete_news(n._id)} className='p-[6px]  rounded hover:shadow-lg hover:shadow-green-500/50'><MdDelete className='text-red-600 ' size={28} /></button>
+                                                </>
+                                           }
                                             {
                                                 store?.userInfo?.role === 'writer' && <>
-                                                    <Link to={`/dashboard/news/edit/${n._id}`} className='p-[6px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEdit /></Link>
+                                                    <Link to={`/dashboard/news/edit/${n._id}`} className='p-[4px] rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEdit className='w-4 h-4'/></Link>
                                                     {/* <div className='p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50'><FaTrash /></div> */}
                                                 </>
                                             }
