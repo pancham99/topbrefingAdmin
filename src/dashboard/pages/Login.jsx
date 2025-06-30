@@ -40,8 +40,8 @@ const Login = () => {
           token: data.token
         }
       })
-      
-      if(data.success === true) {
+
+      if (data.success === true) {
         navigate('/dashboard')
       }
     } catch (error) {
@@ -55,8 +55,12 @@ const Login = () => {
       <div className='w-[340px] text-slate-600 shadow-md'>
         <div className='bg-white h-full px-7 py-8 rounded-md'>
           <div className='w-full justify-center items-center flex'>
-            <h2>News portal </h2>
-            {/* <img className='w-[200px]' src='' alt='' /> */}
+            <div className='h-[70px] flex justify-center items-center'>
+                <div className="flex justify-center items-center ">
+                  <img src="/logo.png" alt="bgimage" className='w-36 h-28 bg-contain' />
+                </div>
+              
+            </div>
           </div>
 
           <form onSubmit={submit}>

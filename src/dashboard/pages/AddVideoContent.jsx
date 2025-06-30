@@ -166,7 +166,7 @@ const AddVideoContent = () => {
             ? "Submitting..."
             : uploading
               ? "Uploading Video..."
-              : "Add Banner"}
+              : "Add Video"}
         </button>
       </form>
     </div>

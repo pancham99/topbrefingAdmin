@@ -52,7 +52,7 @@ const AdminIndex = () => {
 
   return (
     <div className='lg:mt-3 mt-0'>
-      {loading ? <SkeletonBox  /> :
+      {loading ? <SkeletonBox /> :
         <div className='grid lg:grid-cols-5 lg:gap-x-4 gap-4 lg:gap-0 space-y-2 items-center'>
           {/* Total News */}
           <div className='w-full p-8 flex justify-center flex-col rounded-md items-center gap-y-2 bg-white text-slate-700 shadow-md border'>
@@ -98,9 +98,9 @@ const AdminIndex = () => {
           </div>
         </div>
       }
-
-      <DashboardGraph />
-
+      
+        <DashboardGraph  loading={loading}/>
+    
     </div>
   );
 }

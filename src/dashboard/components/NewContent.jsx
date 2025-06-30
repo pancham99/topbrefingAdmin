@@ -10,6 +10,11 @@ import storeContext from '../../context/storeContext'
 import { convert } from 'html-to-text'
 import toast from 'react-hot-toast'
 import { MdDelete } from "react-icons/md";
+import moment from "moment-timezone";
+import FillterStatus from './fillter/FillterStatus';
+import FillterCategory from './fillter/FillterCategory';
+import FillterWriters from './fillter/FillterWriters';
+import Pagination from './Pagination';
 
 
 const NewContent = () => {
@@ -41,8 +46,7 @@ const NewContent = () => {
         }
     }
 
-
-
+    const formattedTime = moment(news?.createdAt).tz("Asia/Kolkata").format('hh:mm A');
     const delete_news = async (news_id) => {
 
         try {
@@ -63,9 +67,6 @@ const NewContent = () => {
             console.error("Delete failed:", error?.response?.data?.message || error.message);
         }
     };
-
-
-
 
     const get_writers = async () => {
         try {
@@ -180,37 +181,9 @@ const NewContent = () => {
     return (
         <div>
             <div className='px-4 py-3 lg:flex flex-cols lg:gap-x-3  space-y-3 lg:space-y-0'>
-                <select onChange={type_fillter} name='' className='lg:px-3 w-full py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
-
-                    <option value=''>---Select type---</option>
-                    <option value='pending'>pending</option>
-                    <option value='active'>active</option>
-                    <option value='deactive'>deactive</option>
-                </select>
-
-
-                <select onChange={type_fillter_category} name='' className='lg:px-3 w-full  py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
-
-                    <option value="">---select category--</option>
-                    <option value="शिक्षा">शिक्षा</option>
-                    <option value="राजनीति">राजनीति </option>
-                    <option value="स्वास्थ्य">स्वास्थ्य</option>
-                    <option value="अंतरराष्ट्रीय">अंतरराष्ट्रीय</option>
-                    <option value="खेल">खेल</option>
-                    <option value="प्रौद्योगिकी">प्रौद्योगिकी</option>
-                    <option value="यात्रा">यात्रा</option>
-                    <option value="मनोरंजन">मनोरंजन</option>
-                    <option value="भक्ति">भक्ति</option>
-                    <option value="लाइफस्टाइल">लाइफस्टाइल</option>
-                    <option value="अपराध">अपराध</option>
-                </select>
-
-
-                <select onChange={type_fillter_writer} name='' className='lg:px-3 w-full py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id=''>
-
-                    <option value="">---select Writer--</option>
-                    {writers.map((w, i) => <option key={i} value={w.name}>{w.name}</option>)}
-                </select>
+                <FillterStatus type_fillter={type_fillter} />
+                <FillterCategory type_fillter_category={type_fillter_category} />
+                <FillterWriters type_fillter_writer={type_fillter_writer} writers={writers} />
                 <input onChange={serach_news} type='text' placeholder='search news' className='lg:px-3 w-full  py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' />
             </div>
             <div className='relative overflow-x-auto p-4'>
@@ -223,6 +196,7 @@ const NewContent = () => {
                             <th className='px-7 py-3'>Category</th>
                             <th className='px-7 py-3'>Description</th>
                             <th className='px-7 py-3'>Date</th>
+                            <th className='px-7 py-3'>Time</th>
                             <th className='px-7 py-3'>Status</th>
                             {/* <th className='px-7 py-3'>Active</th> */}
                             <th className='px-7 py-3'>Action</th>
@@ -231,7 +205,7 @@ const NewContent = () => {
                     <tbody>
                         {
                             news.length > 0 && news.slice((page - 1) * parPage, page * parPage).map((n, i) =>
-                                <tr key={i} className='bg-white border-b'>
+                                <tr key={i} className='bg-white border-b text-xs'>
                                     <td className='px-6 py-4'>{i + 1}</td>
                                     <td className='px-6 py-4'>{n.title.slice(0, 15)}...</td>
                                     <td className='px-6 py-4'>
@@ -240,6 +214,7 @@ const NewContent = () => {
                                     <td className='px-6 py-4'>{n.category}</td>
                                     <td className='px-6 py-4'>{convert(n.description).slice(0, 15)}...</td>
                                     <td className='px-6 py-4'>{n.date}</td>
+                                    <td className='px-6 py-4'>{formattedTime}</td>
                                     {
                                         store?.userInfo?.role === 'admin' ? <td className='px-6 py-4'>
 
@@ -271,14 +246,14 @@ const NewContent = () => {
                                     }
                                     <td className='px-6 py-4'>
                                         <div className='px-6 py-4'>
-                                           {
+                                            {
                                                 store?.userInfo?.role === 'admin' && <>
-                                                 <button onClick={() => delete_news(n._id)} className='p-[6px]  rounded hover:shadow-lg hover:shadow-green-500/50'><MdDelete className='text-red-600 ' size={28} /></button>
+                                                    <button onClick={() => delete_news(n._id)} className='p-[6px]  rounded hover:shadow-lg hover:shadow-green-500/50'><MdDelete className='text-red-600 ' size={28} /></button>
                                                 </>
-                                           }
+                                            }
                                             {
                                                 store?.userInfo?.role === 'writer' && <>
-                                                    <Link to={`/dashboard/news/edit/${n._id}`} className='p-[4px] rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEdit className='w-4 h-4'/></Link>
+                                                    <Link to={`/dashboard/news/edit/${n._id}`} className='p-[4px] rounded hover:shadow-lg hover:shadow-yellow-500/50'><FaEdit className='w-4 h-4' /></Link>
                                                     {/* <div className='p-[6px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50'><FaTrash /></div> */}
                                                 </>
                                             }
@@ -298,43 +273,8 @@ const NewContent = () => {
                 </table>
             </div>
 
-            <div className='flex items-center justify-end px-10 gap-x-3 text-slate-600 '>
-                <div className='flex gap-x-3 justify-center items-center'>
-                    <p className='px-4 py-3 font-semibold text-sm'>New par Page</p>
-                    <select value={parPage} onChange={(e) => {
-                        setPerPage(parseInt(e.target.value))
-                        setPage(1)
 
-
-                    }} name='category' id='category' type='text' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10'>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="30">30 </option>
-                        <option value="40">40</option>
-                        <option value="50">50</option>
-                        <option value="60">60</option>
-                        <option value="70">70</option>
-                        <option value="80">80</option>
-                        <option value="90">90</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <p className='px-6 py-3 font-semibold text-sm'>{(page - 1) * parPage + 1}/{news.length} - of {pages}</p>
-                <div className='flex items-center gap-x-3'>
-                    <IoIosArrowBack onClick={() => {
-                        if (page > 1) {
-                            setPage(page - 1)
-                        }
-                    }} className='w-5 h-5 cursor-pointer' />
-                    <IoIosArrowForward onClick={() => {
-                        if (page < 1) {
-                            setPage(page + pages)
-                        }
-                    }} className='w-5 h-5 cursor-pointer' />
-
-
-                </div>
-            </div>
+            <Pagination parPage={parPage} news={news} page={page} pages={pages} setPerPage={setPerPage} setPage={setPage} />
 
         </div>
     )

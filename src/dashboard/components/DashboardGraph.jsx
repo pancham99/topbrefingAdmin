@@ -3,6 +3,7 @@ import axios from 'axios';
 import storeContext from '../../context/storeContext';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import { base_url } from '../../config/config';
+import SkeletonBox from './SkeletonBox';
 
 const COLORS = {
   active: "#4CAF50",
@@ -10,7 +11,7 @@ const COLORS = {
   deactive: "#F44336"
 };
 
-const DashboardGraph = () => {
+const DashboardGraph = ({ loading }) => {
   const { store } = useContext(storeContext);
   const [all_news, set_all_news] = useState([]);
   const [all_writes, set_all_writes] = useState([]);
@@ -61,55 +62,64 @@ const DashboardGraph = () => {
   ];
 
   return (
-    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-10">
-      {/* News Chart */}
-      <div className="bg-white p-5 rounded  shadow-md border">
-        <h2 className="text-xl font-bold mb-5">News Status</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={newsData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label
-            >
-              {newsData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
 
-      {/* Writer Chart */}
-      <div className="bg-white p-5 rounded shadow-md border">
-        <h2 className="text-xl font-bold mb-5">Writers Status</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={writerData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label
-            >
-              {writerData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+
+    <>
+
+      {
+        loading ? <SkeletonBox /> : <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* News Chart */}
+          <div className="bg-white p-5 rounded  shadow-md border">
+            <h2 className="text-xl font-bold mb-5">News Status</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={newsData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {newsData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Writer Chart */}
+          <div className="bg-white p-5 rounded shadow-md border">
+            <h2 className="text-xl font-bold mb-5">Writers Status</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={writerData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {writerData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      }
+
+
+    </>
   );
 };
 

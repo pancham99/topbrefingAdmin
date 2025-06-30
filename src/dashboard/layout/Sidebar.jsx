@@ -11,6 +11,7 @@ import storeContext from '../../context/storeContext'
 import { IoLogOutOutline } from "react-icons/io5";
 import { PiFlagBannerFoldBold } from "react-icons/pi";
 import { IoIosVideocam } from "react-icons/io";
+import { FcAdvertising } from "react-icons/fc";
 
 const Sidebar = () => {
     const navigate = useNavigate()
@@ -73,6 +74,19 @@ const Sidebar = () => {
                             <Link to="/dashboard/banner" className={`px-3 ${pathname === "/dashboard/banner" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><PiFlagBannerFoldBold /></span>
                                 <span>Banner</span>
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link to="/dashboard/createAdvertisement" className={`px-3 ${pathname === "/dashboard/createAdvertisement" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
+                                <span className='text-xl'><AiOutlinePlus /></span>
+                                <span>Add Advertisement</span>
+                            </Link>
+                        </li>
+                          <li>
+                            <Link to="/dashboard/advertisement" className={`px-3 ${pathname === "/dashboard/advertisement" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
+                                <span className='text-xl'><FcAdvertising /></span>
+                                <span>Advertisement</span>
                             </Link>
                         </li>
 
