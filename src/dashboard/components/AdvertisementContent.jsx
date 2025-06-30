@@ -34,7 +34,7 @@ const AdvertisementContent = () => {
                 return;
             }
 
-            const response = await axios.delete(`http://localhost:5000/api/advertisement/delete/${_id}`, {
+            const response = await axios.delete(`${base_url}/api/advertisement/delete/${_id}`, {
                 headers: {
                     Authorization: `Bearer ${store?.token}`,
                 },
