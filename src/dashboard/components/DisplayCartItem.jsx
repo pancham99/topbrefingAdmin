@@ -86,13 +86,13 @@ const DisplayCartItem = ({ close }) => {
                                     </li>
 
                                     <li>
-                                        <Link to="/dashboard/createAdvertisement" className={`px-3 ${pathname === "/dashboard/createAdvertisement" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
+                                        <Link to="/dashboard/createAdvertisement" onClick={close} className={`px-3 ${pathname === "/dashboard/createAdvertisement" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                             <span className='text-xl'><AiOutlinePlus /></span>
                                             <span>Add Advertisement</span>
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link to="/dashboard/advertisement" className={`px-3 ${pathname === "/dashboard/advertisement" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
+                                        <Link to="/dashboard/advertisement" onClick={close} className={`px-3 ${pathname === "/dashboard/advertisement" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                             <span className='text-xl'><FcAdvertising /></span>
                                             <span>Advertisement</span>
                                         </Link>

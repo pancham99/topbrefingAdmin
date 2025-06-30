@@ -35,7 +35,7 @@ const Advertisement_edit = () => {
   // 👉 GET data
   const getAdvertisement = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/advertisement/get/${_id}`, {
+      const { data } = await axios.get(`${base_url}/api/advertisement/get/${_id}`, {
         headers: { 'Authorization': `Bearer ${store.token}` }
       });
 
@@ -110,7 +110,7 @@ const Advertisement_edit = () => {
       if (formData.image) fd.append("image", formData.image);
       if (formData.video) fd.append("video", formData.video);
 
-      const { data } = await axios.put(`http://localhost:5000/api/advertisement/update/${_id}`, fd, {
+      const { data } = await axios.put(`${base_url}/api/advertisement/update/${_id}`, fd, {
         headers: {
           'Authorization': `Bearer ${store.token}`,
           'Content-Type': 'multipart/form-data'
