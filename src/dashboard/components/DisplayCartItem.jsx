@@ -13,6 +13,7 @@ import storeContext from '../../context/storeContext'
 import { IoLogOutOutline } from "react-icons/io5";
 import { PiFlagBannerFoldBold } from 'react-icons/pi';
 import { IoIosVideocam } from 'react-icons/io';
+import { FcAdvertising } from 'react-icons/fc';
 
 const DisplayCartItem = ({ close }) => {
     const navigate = useNavigate()

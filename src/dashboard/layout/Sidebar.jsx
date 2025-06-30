@@ -31,7 +31,7 @@ const Sidebar = () => {
                 <Link to="/">
 
                     <div className="flex flex-col justify-center items-center md:items-start mt-8">
-                        <img src="/logo.png" alt="bgimage" className='w-36 h-28 bg-contain'/>
+                        <img src="/logo.png" alt="bgimage" className='w-36 h-28 bg-contain' />
                     </div>
                     {/* <h1><span className='text-3xl text-red-600 font-semibold'>Top</span><span className='text-red-400'>Briefing</span></h1> */}
                 </Link>
@@ -83,7 +83,7 @@ const Sidebar = () => {
                                 <span>Add Advertisement</span>
                             </Link>
                         </li>
-                          <li>
+                        <li>
                             <Link to="/dashboard/advertisement" className={`px-3 ${pathname === "/dashboard/advertisement" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><FcAdvertising /></span>
                                 <span>Advertisement</span>
