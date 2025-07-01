@@ -7,49 +7,58 @@ import storeContext from '../../context/storeContext';
 import { convert } from 'html-to-text';
 import moment from 'moment-timezone';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast'
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAdvertisements, deleteAdvertisement } from '../../features/advertisement/advertisementSlice';
 
 const AdvertisementContent = () => {
     const { store } = useContext(storeContext);
-    const [news, setNews] = useState([]);
+    const dispatch = useDispatch();
+    const { advertisements, loading, status } = useSelector((state) => state.advertisement)
 
-    const get_news = async () => {
+    const deleteHandler = async (_id) => {
+        if (!_id) return;
+
         try {
-            const { data } = await axios.get(`${base_url}/api/advertisement/getall`, {
-                headers: {
-                    'Authorization': `Bearer ${store.token}`
-                }
-            });
-            setNews(data);
-        } catch (error) {
-            console.error(error.message);
-        }
-    };
+            const result = await dispatch(deleteAdvertisement({ _id, token: store.token }));
 
-
-
-    const delete_news = async (_id) => {
-        try {
-            if (!_id) {
-                console.error("Invalid news ID");
-                return;
+            if (deleteAdvertisement.fulfilled.match(result)) {
+                toast.success("Advertisement deleted successfully")
+            } else {
+                console.error("Delete failed:", result.payload);
             }
-
-            const response = await axios.delete(`${base_url}/api/advertisement/delete/${_id}`, {
-                headers: {
-                    Authorization: `Bearer ${store?.token}`,
-                },
-            });
-
-            // Refetch the news list
-            get_news();
         } catch (error) {
-            console.error("Delete failed:", error?.response?.data?.message || error.message);
+            console.error("Error deleting advertisement:", error);
         }
     };
 
     useEffect(() => {
-        get_news();
-    }, []);
+        if (store?.token) {
+            dispatch(fetchAdvertisements(store.token));
+        }
+    }, [store?.token, dispatch]);
+
+    // const delete_news = async (_id) => {
+    //     try {
+    //         if (!_id) {
+    //             console.error("Invalid news ID");
+    //             return;
+    //         }
+
+    //         const response = await axios.delete(`${base_url}/api/advertisement/delete/${_id}`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${store?.token}`,
+    //             },
+    //         });
+
+    //         // Refetch the news list
+    //         get_news();
+    //     } catch (error) {
+    //         console.error("Delete failed:", error?.response?.data?.message || error.message);
+    //     }
+    // };
+
+ 
 
     return (
         <div className="p-4">
@@ -76,7 +85,7 @@ const AdvertisementContent = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {news.map((n, i) => (
+                        {advertisements.map((n, i) => (
                             <tr key={n._id} className="bg-white border-b text-xs items-center text-center hover:bg-gray-50">
                                 <td className="px-4 py-2">{i + 1}</td>
                                 <td className="px-4 py-2">{n.companyName}</td>
@@ -103,7 +112,7 @@ const AdvertisementContent = () => {
                                         <Link to={`/dashboard/advertisement_edit/${n._id}`} news={n} className="text-yellow-600 hover:text-yellow-800">
                                             <FaEdit size={18} />
                                         </Link>
-                                        <button onClick={() => delete_news(n._id)} className="text-red-600 hover:text-red-800">
+                                        <button onClick={() => deleteHandler(n._id)} className="text-red-600 hover:text-red-800">
                                             <MdDelete size={18} />
                                         </button>
                                     </div>

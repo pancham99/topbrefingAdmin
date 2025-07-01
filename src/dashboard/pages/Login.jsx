@@ -30,9 +30,9 @@ const Login = () => {
     try {
       setLoder(true)
       const { data } = await axios.post(`${base_url}/api/login`, state)
-      console.log(data, "data")
+      console.log(data)
       setLoder(false)
-      localStorage.setItem('newstoken', data.token)
+      
       tost.success(data.message)
       dispatch({
         type: 'login_success',
@@ -42,6 +42,7 @@ const Login = () => {
       })
 
       if (data.success === true) {
+        localStorage.setItem('newstoken', data.token)
         navigate('/dashboard')
       }
     } catch (error) {

@@ -5,12 +5,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import storeContext from "../../context/storeContext";
 import { MdCloudUpload } from "react-icons/md";
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAdvertisementById, fetchAdvertisements, updateAdvertisement } from '../../features/advertisement/advertisementSlice';
+import { use } from 'react';
 
 const Advertisement_edit = () => {
   const navigate = useNavigate();
-  const { _id } = useParams();  // 👈 URL param
+  const { _id } = useParams();
   const { store } = useContext(storeContext);
-
+  const dispatch = useDispatch()
+  const { data } = useSelector((state) => state.advertisement);
   const [loader, setLoader] = useState(false);
   const [preview, setPreview] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
@@ -32,43 +36,37 @@ const Advertisement_edit = () => {
     video: ""
   });
 
-  // 👉 GET data
-  const getAdvertisement = async () => {
-    try {
-      const { data } = await axios.get(`${base_url}/api/advertisement/get/${_id}`, {
-        headers: { 'Authorization': `Bearer ${store.token}` }
-      });
 
-      // Pre-fill form
-      setFormData({
-        title: data.title || "",
-        description: data.description || "",
-        companyName: data.companyName || "",
-        bannertype: data.bannerType || "",
-        deviceTarget: data.deviceTarget || "",
-        pageTarget: data.pageTarget || "",
-        locationTarget: data.locationTarget || "",
-        placementKey: data.placementKey || "",
-        link: data.link || "",
-        priority: data.priority || "",
-        dayDuration: data.dayDuration || "",
-        amount: data.amount || "",
-        image: "",   // file input reset
-        video: ""    // file input reset
-      });
 
-      if (data.image) setPreview(data.image);
-      if (data.video) setVideoPreview(data.video);
-
-    } catch (error) {
-      console.error(error.message);
-      toast.error("Failed to fetch advertisement");
-    }
-  };
-
+  // Fetch advertisement data by ID
   useEffect(() => {
-    getAdvertisement();
-  }, []);
+    dispatch(fetchAdvertisementById({ _id, token: store.token }))
+  }, [_id, store.token]);
+
+  // 👉 GET data
+  useEffect(() => {
+    if (data && data.title) {
+      setFormData({
+        ...formData,
+        title: data.title,
+        description: data.description,
+        companyName: data.companyName,
+        bannertype: data.bannerType,
+        deviceTarget: data.deviceTarget,
+        pageTarget: data.pageTarget,
+        locationTarget: data.locationTarget,
+        placementKey: data.placementKey,
+        link: data.link,
+        priority: data.priority,
+        dayDuration: data.dayDuration,
+        amount: data.amount,
+        image: '',
+        video: ''
+      })
+      if (data.image) setPreview(data.image)
+      if (data.video) setVideoPreview(data.video)
+    }
+  }, [data])
 
   // 👉 Handle form change
   const handleChange = (e) => {
@@ -87,10 +85,8 @@ const Advertisement_edit = () => {
     }
   };
 
-  // 👉 Submit form
   const submitHandler = async (e) => {
     e.preventDefault();
-    setLoader(true);
 
     try {
       const fd = new FormData();
@@ -110,22 +106,23 @@ const Advertisement_edit = () => {
       if (formData.image) fd.append("image", formData.image);
       if (formData.video) fd.append("video", formData.video);
 
-      const { data } = await axios.put(`${base_url}/api/advertisement/update/${_id}`, fd, {
-        headers: {
-          'Authorization': `Bearer ${store.token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const res = await dispatch(updateAdvertisement({ _id, fd, token: store.token }));
+      if (res.meta.requestStatus === 'fulfilled') {
+        dispatch(fetchAdvertisements(store.token)); 
+      }
 
-      toast.success(data.message || "Advertisement updated");
-      navigate("/dashboard/advertisement");
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Something went wrong");
-    } finally {
-      setLoader(false);
+
+      if (res?.payload?.message) {
+        toast.success(res.payload.message);
+        navigate('/dashboard/advertisement');
+      } else {
+        toast.error(res?.payload || "Update failed");
+      }
+    } catch (err) {
+      toast.error("Failed to update");
     }
   };
+
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow rounded-md">

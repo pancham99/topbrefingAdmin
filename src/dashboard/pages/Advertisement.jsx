@@ -7,12 +7,12 @@ import { MdCloudUpload } from "react-icons/md";
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux'
 
-import {addAdvertisement} from '../../features/advertisement/advertisementSlice'
+import { addAdvertisement } from '../../features/advertisement/advertisementSlice'
 
 const Advertisement = () => {
   const navigate = useNavigate();
   const { store } = useContext(storeContext);
-   const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
   const [loader, setLoader] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,7 +31,7 @@ const Advertisement = () => {
     video: "",
     amount: ""
   });
-  console.log(formData);
+
 
   const [preview, setPreview] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
@@ -53,63 +53,41 @@ const Advertisement = () => {
   };
 
 
- const submitHandler = async (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault()
     try {
-      const res = await dispatch(addAdvertisement({  formData, token }))
-      if (res?.payload?.message) toast.success(res.payload.message)
+      const fd = new FormData();
+      fd.append("title", formData.title);
+      fd.append("description", formData.description);
+      fd.append("companyName", formData.companyName);
+      fd.append("bannerType", formData.bannertype);
+      fd.append("deviceTarget", formData.deviceTarget);
+      fd.append("pageTarget", formData.pageTarget);
+      fd.append("locationTarget", formData.locationTarget);
+      fd.append("placementKey", formData.placementKey);
+      fd.append("link", formData.link);
+      fd.append("priority", formData.priority);
+      fd.append("dayDuration", formData.dayDuration);
+      fd.append("amount", formData.amount);
+
+
+
+      if (formData.image) {
+        fd.append("image", formData.image);
+      }
+      if (formData.video) {
+        fd.append("video", formData.video);
+      }
+      const res = await dispatch(addAdvertisement({ fd, token: store.token }))
+      if (res?.payload?.message)
+        toast.success(res.payload.message)
       navigate('/dashboard/advertisement')
     } catch (err) {
-      toast.error('Failed to update')
+      toast.error('Failed to add advertisement: ');
+      console.error('Error adding advertisement:', err);
     }
   }
 
-
-  // const added = async (e) => {
-  //   e.preventDefault();
-  //   setLoader(true);
-
-  //   try {
-  //     const fd = new FormData();
-  //     fd.append("title", formData.title);
-  //     fd.append("description", formData.description);
-  //     fd.append("companyName", formData.companyName);
-  //     fd.append("bannerType", formData.bannertype);
-  //     fd.append("deviceTarget", formData.deviceTarget);
-  //     fd.append("pageTarget", formData.pageTarget);
-  //     fd.append("locationTarget", formData.locationTarget);
-  //     fd.append("placementKey", formData.placementKey);
-  //     fd.append("link", formData.link);
-  //     fd.append("priority", formData.priority);
-  //     fd.append("dayDuration", formData.dayDuration);
-  //     fd.append("amount", formData.amount);
-
-      
-
-  //     if (formData.image) {
-  //       fd.append("image", formData.image);
-  //     }
-  //     if (formData.video) {
-  //       fd.append("video", formData.video);
-  //     }
-
-  //     const { data } = await axios.post(`http://localhost:5000/api/advertisement/add`, fd, {
-  //       headers: {
-  //         'Authorization': `Bearer ${store.token}`,
-  //         'Content-Type': 'multipart/form-data'
-  //       }
-  //     });
-
-  //     setLoader(false);
-  //     toast.success(data.message);
-  //     navigate("/dashboard/advertisement");
-
-  //   } catch (error) {
-  //     setLoader(false);
-  //     console.error(error);
-  //     toast.error(error.response?.data?.message || 'Something went wrong');
-  //   }
-  // };
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow rounded-md">
@@ -154,9 +132,9 @@ const Advertisement = () => {
 
 
 
-         <select name="pageTarget" value={formData.pageTarget} onChange={handleChange} className="w-full border rounded p-2" required>
+        <select name="pageTarget" value={formData.pageTarget} onChange={handleChange} className="w-full border rounded p-2" required>
           <option value="">Page Target (e.g., homepage, sports)</option>
-           <option value="home">Home Page</option>
+          <option value="home">Home Page</option>
           <option value="category">Category Page</option>
           <option value="news">News Details Page</option>
           <option value="state">State News Page</option>
@@ -178,7 +156,7 @@ const Advertisement = () => {
 
         <input type="number" name="priority" placeholder="Priority (1 highest)" value={formData.priority} onChange={handleChange} className="w-full border rounded p-2" min="0" />
 
-         <input type="number" name="amount" placeholder="Amount" value={formData.amount} onChange={handleChange} className="w-full border rounded p-2" min="0" />
+        <input type="number" name="amount" placeholder="Amount" value={formData.amount} onChange={handleChange} className="w-full border rounded p-2" min="0" />
 
         <input type="number" name="dayDuration" placeholder="Display Duration in Days" value={formData.dayDuration} onChange={handleChange} className="w-full border rounded p-2" min="1" required />
 
