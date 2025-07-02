@@ -21,6 +21,7 @@ const NewContent = () => {
 
     const { store } = useContext(storeContext)
     const [news, setNews] = useState([])
+    console.log(news, "news gg")
     const [all_news, set_all_news] = useState([])
     const [writers, setWriters] = useState([])
 
@@ -47,6 +48,14 @@ const NewContent = () => {
     }
 
     const formattedTime = moment(news?.createdAt).tz("Asia/Kolkata").format('hh:mm A');
+
+    const onlyTime = new Date(news?.createdAt).toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true, // AM/PM format
+    });
+
+    console.log(onlyTime, "only time")
     const delete_news = async (news_id) => {
 
         try {
@@ -214,7 +223,7 @@ const NewContent = () => {
                                     <td className='px-6 py-4'>{n.category}</td>
                                     <td className='px-6 py-4'>{convert(n.description).slice(0, 15)}...</td>
                                     <td className='px-6 py-4'>{n.date}</td>
-                                    <td className='px-6 py-4'>{formattedTime}</td>
+                                    <td className='px-6 py-4'>{moment(n.createdAt).tz("Asia/Kolkata").format("hh:mm A")}</td>
                                     {
                                         store?.userInfo?.role === 'admin' ? <td className='px-6 py-4'>
 
