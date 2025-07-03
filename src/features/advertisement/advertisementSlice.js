@@ -65,6 +65,20 @@ export const updateAdvertisement = createAsyncThunk(
   }
 );
 
+export const update_ststus_advertisement = createAsyncThunk("advertisement/updateStatus",
+    async ({ _id, status, token }, { rejectWithValue }) => {
+    try {
+        const { data } = await axios.put(`${base_url}/api/advertisement/status/${_id}`, { status }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return data.updatedAdvertisement || data;   
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to update advertisement status");   
+    }
+});
+
 
 export const fetchAdvertisementById = createAsyncThunk("advertisement/fetchById", async ({ _id, token }, { rejectWithValue }) => {
     try {
@@ -152,6 +166,20 @@ const advertisementSlice = createSlice({
                 state.data = action.payload;
             })
             .addCase(fetchAdvertisementById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(update_ststus_advertisement.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(update_ststus_advertisement.fulfilled, (state, action) => {
+                state.loading = false;
+                const index = state.advertisements.findIndex(ad => ad._id === action.payload._id);
+                if (index !== -1) {
+                    state.advertisements[index] = action.payload;
+                }
+            })
+            .addCase(update_ststus_advertisement.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

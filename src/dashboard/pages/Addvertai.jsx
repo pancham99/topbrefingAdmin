@@ -17,16 +17,6 @@ const Addvertai = () => {
 
             <AdvertisementContent />
 
-
-            <div>
-                <div className='p-4'>
-                    <h3 className='text-lg font-semibold'>Dear Admin</h3>
-                    <p className='text-gray-500'>
-                        The module is currently under development, so certain functionalities may not be working as expected. We appreciate your understanding.</p>
-                </div>
-            </div>
-
-
         </div>
     )
 }

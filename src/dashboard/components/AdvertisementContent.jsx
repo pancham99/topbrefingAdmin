@@ -9,7 +9,7 @@ import moment from 'moment-timezone';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast'
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAdvertisements, deleteAdvertisement } from '../../features/advertisement/advertisementSlice';
+import { fetchAdvertisements, deleteAdvertisement, update_ststus_advertisement } from '../../features/advertisement/advertisementSlice';
 
 const AdvertisementContent = () => {
     const { store } = useContext(storeContext);
@@ -32,11 +32,46 @@ const AdvertisementContent = () => {
         }
     };
 
+
+    const [res, setRes] = useState({
+        id: '',
+        loader: false,
+    })
+
+    const update_status = async ({ _id, status }) => {
+        console.log(_id, status, "status update");
+        try {
+
+            setRes({
+                id: _id,
+                loader: true
+            })
+            const result = await dispatch(update_ststus_advertisement({ _id, status, token: store.token }));
+
+            if (update_ststus_advertisement.fulfilled.match(result)) {
+                setRes({
+                    id: _id,
+                    loader: false
+                })
+                toast.success("status updated successfully");
+                // Refetch the advertisements list
+
+                dispatch(fetchAdvertisements(store.token));
+            } else {
+                console.error("Status update failed:", result.payload);
+            }
+        } catch (error) {
+            console.error("Error updating advertisement status:", error);
+        }
+    }
+
     useEffect(() => {
         if (store?.token) {
             dispatch(fetchAdvertisements(store.token));
         }
     }, [store?.token, dispatch]);
+
+
 
     // const delete_news = async (_id) => {
     //     try {
@@ -58,7 +93,7 @@ const AdvertisementContent = () => {
     //     }
     // };
 
- 
+
 
     return (
         <div className="p-4">
@@ -105,7 +140,17 @@ const AdvertisementContent = () => {
                                 <td className="px-4 py-2">{n.pageTarget}</td>
                                 <td className="px-4 py-2">{n.priority}</td>
                                 <td className="px-4 py-2">{n.deviceTarget}</td>
-                                <td className="px-4 py-2 ">{n.status}</td>
+                                <td className="px-4 py-2 ">
+                                    {
+                                        n.status === 'pending' && <span onClick={() => update_status({ _id: n._id, status: 'active' })} className='px-2 py-[2px] bg-blue-100 text-blue-800 rounded-lg text-xs cursor-pointer'>{res.loader && res.id === n._id ? 'Loading..' : n.status}</span>
+                                    }
+                                    {
+                                        n.status === 'active' && <span onClick={() => update_status({ _id: n._id, status: 'deactive' })} className='px-2 py-[2px] bg-green-100 text-green-800 rounded-lg text-xs cursor-pointer'>{res.loader && res.id === n._id ? 'Loading..' : n.status}</span>
+                                    }
+                                    {
+                                        n.status === 'deactive' && <span onClick={() => update_status({ _id: n._id, status: 'active' })} className='px-2 py-[2px] bg-red-100 text-red-800 rounded-lg text-xs cursor-pointer'>{res.loader && res.id === n._id ? 'Loading..' : n.status}</span>
+                                    }
+                                </td>
                                 <td className="px-4 py-2 ">
 
                                     <div className="flex justify-center items-center gap-2">
