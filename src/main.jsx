@@ -15,6 +15,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Toaster />
       </>
 
-    </StoreProvider>,
+    </StoreProvider>
   </Provider>
 )

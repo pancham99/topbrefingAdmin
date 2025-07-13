@@ -32,7 +32,7 @@ const Login = () => {
       const { data } = await axios.post(`${base_url}/api/login`, state)
       console.log(data)
       setLoder(false)
-      
+
       tost.success(data.message)
       dispatch({
         type: 'login_success',
@@ -52,15 +52,15 @@ const Login = () => {
   }
 
   return (
-    <div className='min-w-screen min-h-screen bg-slate-200 flex justify-center items-center'>
+    <div className='h-screen bg-slate-200 flex justify-center items-center'>
       <div className='w-[340px] text-slate-600 shadow-md'>
         <div className='bg-white h-full px-7 py-8 rounded-md'>
           <div className='w-full justify-center items-center flex'>
             <div className='h-[70px] flex justify-center items-center'>
-                <div className="flex justify-center items-center ">
-                  <img src="/logo.png" alt="bgimage" className='w-36 h-28 bg-contain' />
-                </div>
-              
+              <div className="flex justify-center items-center ">
+                <img src="/logo.png" alt="bgimage" className='w-36 h-28 bg-contain' />
+              </div>
+
             </div>
           </div>
 
@@ -80,7 +80,6 @@ const Login = () => {
               <button disabled={loder} className='px-3 py-[6px] w-full bg-purple-500 rounded-md text-white hover:bg-purple-600' to='/dashboard/writers'>{loder ? "loding.." : "Login"}</button>
             </div>
           </form>
-
         </div>
       </div>
     </div>
