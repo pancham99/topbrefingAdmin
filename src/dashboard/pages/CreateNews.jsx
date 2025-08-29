@@ -45,6 +45,8 @@ const CreateNews = () => {
 
   const added = async (e) => {
     e.preventDefault()
+
+
     const formData = new FormData()
     formData.append('title', title)
     formData.append('image', image)
@@ -63,6 +65,7 @@ const CreateNews = () => {
       navigate("/dashboard/news");
     } catch (error) {
       setLoader(false)
+      navigate("/dashboard/serverDown");
       toast.error(error.response.data.message)
 
     }

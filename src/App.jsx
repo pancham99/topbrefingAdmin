@@ -23,6 +23,7 @@ import Deactive from './dashboard/pages/Deactive';
 import Advertisement from './dashboard/pages/Advertisement';
 import Addvertai from './dashboard/pages/Addvertai';
 import Advertisement_edit from './dashboard/pages/Advertisement_edit';
+import ServerDown from './dashboard/pages/ServerDown';
 
 
 function App() {
@@ -75,6 +76,10 @@ function App() {
               <Route path="createAdvertisement" element={<Advertisement />} />
               <Route path="advertisement" element={<Addvertai />} />
               <Route path="advertisement_edit/:_id" element={<Advertisement_edit />} />
+              
+
+
+              
             </Route>
 
             {/* ✅ Writer Routes */}
@@ -82,6 +87,7 @@ function App() {
               <Route path="writer" element={<WriterIndex />} />
               <Route path="news/create" element={<CreateNews />} />
               <Route path="news/edit/:news_id" element={<Edit_news />} />
+               <Route path="serverDown" element={<ServerDown />} />
             </Route>
           </Route>
         </Route>
