@@ -1,5 +1,5 @@
 
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AiFillDashboard } from "react-icons/ai";
 import { BiNews } from "react-icons/bi";
@@ -10,7 +10,7 @@ import { FaPlus } from "react-icons/fa";
 import storeContext from '../../context/storeContext'
 import { IoLogOutOutline } from "react-icons/io5";
 import { PiFlagBannerFoldBold } from "react-icons/pi";
-import { IoIosVideocam } from "react-icons/io";
+// import { IoIosVideocam } from "react-icons/io";
 import { FcAdvertising } from "react-icons/fc";
 
 const Sidebar = () => {
@@ -90,19 +90,26 @@ const Sidebar = () => {
                             </Link>
                         </li>
 
-                        <li>
+                           <li>
+                            <Link to="/dashboard/subscribe" className={`px-3 ${pathname === "/dashboard/subscribe" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
+                                <span className='text-xl'><FiUsers /></span>
+                                <span>Subscribe</span>
+                            </Link>
+                        </li>
+
+                        {/* <li>
                             <Link to="/dashboard/addVideoContent" className={`px-3 ${pathname === "/dashboard/addVideoContent" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><AiOutlinePlus /></span>
                                 <span>Add Video</span>
                             </Link>
-                        </li>
+                        </li> */}
 
-                        <li>
+                        {/* <li>
                             <Link to="/dashboard/video" className={`px-3 ${pathname === "/dashboard/video" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
                                 <span className='text-xl'><IoIosVideocam /></span>
                                 <span>Video</span>
                             </Link>
-                        </li>
+                        </li> */}
                     </> : <>
 
                         <li>

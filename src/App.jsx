@@ -24,6 +24,7 @@ import Advertisement from './dashboard/pages/Advertisement';
 import Addvertai from './dashboard/pages/Addvertai';
 import Advertisement_edit from './dashboard/pages/Advertisement_edit';
 import ServerDown from './dashboard/pages/ServerDown';
+import Subscribers from './dashboard/pages/Subscribe';
 
 
 function App() {
@@ -68,6 +69,7 @@ function App() {
               <Route path="admin" element={<AdminIndex />} />
               <Route path="writer/add" element={<AddWriter />} />
               <Route path="writers" element={<Writers />} />
+               <Route path="subscribe" element={<Subscribers />} />
               <Route path="createBanner" element={<CreateBanner />} />
               <Route path="banner" element={<Banner />} />
               <Route path="addVideoContent" element={<AddVideoContent />} />

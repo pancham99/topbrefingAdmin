@@ -1,6 +1,6 @@
-import React, { useRef, useContext, useState, useEffect } from 'react'
+import { useRef, useContext, useState, useEffect } from 'react'
 import { Link } from "react-router-dom"
-import { FaImage } from "react-icons/fa";
+// import { FaImage } from "react-icons/fa";
 import { MdCloudUpload } from "react-icons/md";
 import JoditEditor from 'jodit-react';
 import Galler from '../components/Galler';
@@ -90,7 +90,7 @@ const CreateNews = () => {
     get_image()
   }, [])
 
-  const [imageLoader, setImageLoader] = useState(false)
+  const [, setImageLoader] = useState(false)
 
   const imageHandler = async (e) => {
     e.preventDefault()

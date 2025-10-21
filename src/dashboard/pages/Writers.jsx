@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import  { useContext, useEffect, useState } from 'react'
 import { Link } from "react-router-dom"
-import { FaEye } from "react-icons/fa";
+// import { FaEye } from "react-icons/fa";
 import axios from 'axios'
 import { base_url } from '../../config/config'
 import storeContext from '../../context/storeContext'
@@ -69,7 +69,7 @@ const Writers = () => {
                 return;
             }
 
-            const response = await axios.delete(`${base_url}/api/news/writer/delete/${user_id}`, {
+          await axios.delete(`${base_url}/api/news/writer/delete/${user_id}`, {
                 headers: {
                     Authorization: `Bearer ${store?.token}`,
                 },
