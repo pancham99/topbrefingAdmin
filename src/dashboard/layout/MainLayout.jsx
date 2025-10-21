@@ -1,8 +1,8 @@
-import React from 'react'
+// import React from 'react'
 import Sidebar from './Sidebar'
 import { Outlet } from 'react-router-dom'
 import Header from './Header'
-import AdminIndex from '../pages/AdminIndex'
+// import AdminIndex from '../pages/AdminIndex'
 const MainLayout = () => {
   return (
     <div className='min-w-screen min-h-screen bg-slate-100'>

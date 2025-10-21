@@ -1,11 +1,10 @@
-import { base_url } from '../../config/config';
-import axios from "axios";
+
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import storeContext from "../../context/storeContext";
 import { MdCloudUpload } from "react-icons/md";
 import toast from 'react-hot-toast';
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch,  } from 'react-redux'
 
 import { addAdvertisement } from '../../features/advertisement/advertisementSlice'
 
@@ -14,7 +13,7 @@ const Advertisement = () => {
   const { store } = useContext(storeContext);
   const dispatch = useDispatch()
 
-  const [loader, setLoader] = useState(false);
+  const [loader, ] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",

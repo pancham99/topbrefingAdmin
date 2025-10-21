@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import axios from 'axios';
-import { base_url } from '../../config/config';
+// import axios from 'axios';
+// import { base_url } from '../../config/config';
 import storeContext from '../../context/storeContext';
 import { convert } from 'html-to-text';
 import moment from 'moment-timezone';
@@ -14,7 +14,7 @@ import { fetchAdvertisements, deleteAdvertisement, update_ststus_advertisement }
 const AdvertisementContent = () => {
     const { store } = useContext(storeContext);
     const dispatch = useDispatch();
-    const { advertisements, loading, status } = useSelector((state) => state.advertisement)
+    const { advertisements,} = useSelector((state) => state.advertisement)
 
     const deleteHandler = async (_id) => {
         if (!_id) return;

@@ -1,7 +1,7 @@
 
 import { IoClose } from 'react-icons/io5'
 
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AiFillDashboard } from "react-icons/ai";
 import { BiNews } from "react-icons/bi";
@@ -12,10 +12,10 @@ import { FaPlus } from "react-icons/fa";
 import storeContext from '../../context/storeContext'
 import { IoLogOutOutline } from "react-icons/io5";
 import { PiFlagBannerFoldBold } from 'react-icons/pi';
-import { IoIosVideocam } from 'react-icons/io';
+// import { IoIosVideocam } from 'react-icons/io';
 import { FcAdvertising } from 'react-icons/fc';
 
-const DisplayCartItem = ({ close }) => {
+const DisplayCartItem = ({close}) => {
     const navigate = useNavigate()
     const { pathname } = useLocation()
 
@@ -99,6 +99,16 @@ const DisplayCartItem = ({ close }) => {
                                     </li>
 
                                     <li>
+                                        <Link to="/dashboard/subscribe" onClick={close} className={`px-3 ${pathname === "/dashboard/subscribe" ? "bg-red-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-red-400 hover:text-white`}>
+                                            <span className='text-xl'><FcAdvertising /></span>
+                                            <span>Subscribe</span>
+                                        </Link>
+                                    </li>
+
+
+                                    
+
+                                    {/* <li>
                                         <Link to="/dashboard/addVideoContent" onClick={close} className={`px-3 ${pathname === "/dashboard/addVideoContent" ? "bg-indigo-500 text-white" : "bg-white text-[#4040f6]"} py-2 hover:shadow-lg hover:shadow-indigo-500/20 w-full rounded-md flex gap-x-2 justify-start items-center hover:bg-indigo-500 hover:text-white`}>
                                             <span className='text-xl'><AiOutlinePlus /></span>
                                             <span>Add Video</span>
@@ -110,7 +120,7 @@ const DisplayCartItem = ({ close }) => {
                                             <span className='text-xl'><IoIosVideocam /></span>
                                             <span>Video</span>
                                         </Link>
-                                    </li>
+                                    </li> */}
                                 </> : <>
 
                                     <li>
