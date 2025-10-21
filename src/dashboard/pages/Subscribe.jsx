@@ -12,7 +12,7 @@ const Subscribers = () => {
   // ✅ Get all subscribers
   const getSubscribers = async () => {
     try {
-      const { data } = await axios.get(`http://localhost:5000/get/subscribers`, {
+      const { data } = await axios.get(`${base_url}/get/subscribers`, {
         headers: {
           Authorization: `Bearer ${store?.token}`,
         },
