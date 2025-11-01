@@ -28,7 +28,7 @@ const NavItem = ({ to, icon, label, active, onClick }) => (
       hover:bg-red-400 hover:text-white transition-colors`}
   >
     <span className="text-xl">{icon}</span>
-    <span>{label}</span>
+    <span className="text-[14px] font-semibold">{label}</span>
   </Link>
 );
 
@@ -45,7 +45,7 @@ const TreeToggle = ({ label, icon, open, onToggle, children, active }) => {
       >
         <div className="flex items-center gap-x-2">
           <span className="text-xl">{icon}</span>
-          <span>{label}</span>
+          <span className="text-[14px] font-semibold">{label}</span>
         </div>
 
         <span
