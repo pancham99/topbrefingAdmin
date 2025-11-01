@@ -56,14 +56,15 @@ const Header = () => {
                 <input type='text' placeholder='search' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10 ml-5' />
 
                 <div className='lg:mr-4'>
-                    <div className='lg:flex gap-x-2 hidden '>
+                    <div className='lg:flex items-center gap-x-2 hidden '>
                         <div className='flex flex-col justify-center items-end'>
                             <span>{store.userInfo.name}</span>
                             <span>{store.userInfo.role}</span>
                         </div>
                         <img
                             className='w-12 h-12 bg-contain rounded-full'
-                            src={profile?.user?.image || '/logo.png'}
+                            src={'/logo.png'}
+                            // src={profile?.user?.image || './logo.png'}
                             alt=''
                         />
                     </div>
