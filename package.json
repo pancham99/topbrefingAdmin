@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.4",
+    "@mui/styled-engine-sc": "^7.3.3",
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.7.2",
     "caniuse-lite": "^1.0.30001718",
@@ -28,7 +32,8 @@
     "react-router-dom": "^6.23.1",
     "recharts": "^2.15.3",
     "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

@@ -51,8 +51,8 @@ const Header = () => {
     // 👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆👆
 
     return (
-        <div className='lg:pl-4 pl-0  lg:fixed lg:w-[calc(100vw-250px)] top-4 z-50 w-full p-2'>
-            <div className={`w-full lg:px-0 px-2 rounded h-[70px] flex justify-between items-center lg:p-4 transition-colors duration-300 ${isScrolled ? 'bg-red-600 text-white' : 'bg-white'}`}>
+        <div className='lg:pl-4 pl-0  lg:fixed lg:w-[calc(100vw-250px)] top-0 z-50 w-full bg-red-600 text-white'>
+            <div className={`w-full lg:px-0 px-2 rounded h-[70px] flex justify-between items-center lg:p-4 transition-colors duration-300 ${isScrolled ? 'bg-red-600 ' : ''}`}>
                 <input type='text' placeholder='search' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10 ml-5' />
 
                 <div className='lg:mr-4'>
