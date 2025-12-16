@@ -25,6 +25,7 @@ import Addvertai from './dashboard/pages/Addvertai';
 import Advertisement_edit from './dashboard/pages/Advertisement_edit';
 import ServerDown from './dashboard/pages/ServerDown';
 import Subscribers from './dashboard/pages/Subscribe';
+import VideoContents from './dashboard/components/VideoContents';
 
 
 function App() {
@@ -78,7 +79,7 @@ function App() {
               <Route path="createAdvertisement" element={<Advertisement />} />
               <Route path="advertisement" element={<Addvertai />} />
               <Route path="advertisement_edit/:_id" element={<Advertisement_edit />} />
-              
+              <Route path="videos" element={<VideoContents/>} />
 
 
               

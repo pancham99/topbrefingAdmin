@@ -6,8 +6,8 @@ import storeContext from "../../context/storeContext";
 import { MdCloudUpload } from "react-icons/md";
 import toast from 'react-hot-toast'
 
-const CLOUD_NAME = "donkxeytk";
-const UPLOAD_PRESET = "ml_default"; // Make sure this preset exists and is unsigned
+const CLOUD_NAME = "dj4c3c8oy";
+const UPLOAD_PRESET = "topbriefing_upload"; // Make sure this preset exists and is unsigned
 
 const AddVideoContent = () => {
   const navigate = useNavigate();

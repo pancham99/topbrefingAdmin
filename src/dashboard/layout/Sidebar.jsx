@@ -49,9 +49,8 @@ const TreeToggle = ({ label, icon, open, onToggle, children, active }) => {
         </div>
 
         <span
-          className={`transform transition-transform duration-200 ${
-            open ? "rotate-90" : "rotate-0"
-          }`}
+          className={`transform transition-transform duration-200 ${open ? "rotate-90" : "rotate-0"
+            }`}
         >
           ▶
         </span>
@@ -111,6 +110,8 @@ const Sidebar = () => {
           { id: "banner", label: "Banner", to: "/dashboard/banner", icon: <PiFlagBannerFoldBold /> },
           { id: "ads-create", label: "Add Advertisement", to: "/dashboard/createAdvertisement", icon: <AiOutlinePlus /> },
           { id: "ads", label: "Advertisement", to: "/dashboard/advertisement", icon: <FcAdvertising /> },
+          { id: "aadvideo", label: "Add Video", to: "/dashboard/addVideoContent", icon: <FcAdvertising /> },
+          { id: "video", label: " Video", to: "/dashboard/videos", icon: <FcAdvertising /> },
         ],
       },
       {
@@ -119,13 +120,13 @@ const Sidebar = () => {
         icon: <BiNews />,
         children: isAdmin
           ? [
-              { id: "news-list", label: "All News", to: "/dashboard/news", icon: <BiNews /> },
+            { id: "news-list", label: "All News", to: "/dashboard/news", icon: <BiNews /> },
             //   { id: "news-create", label: "Add News", to: "/dashboard/news/create", icon: <FaPlus /> },
-            ]
+          ]
           : [
-              { id: "news-list", label: "All News", to: "/dashboard/news", icon: <BiNews /> },
-              { id: "news-create", label: "Add News", to: "/dashboard/news/create", icon: <FaPlus /> },
-            ],
+            { id: "news-list", label: "All News", to: "/dashboard/news", icon: <BiNews /> },
+            { id: "news-create", label: "Add News", to: "/dashboard/news/create", icon: <FaPlus /> },
+          ],
       },
       {
         id: "profile",
@@ -153,8 +154,8 @@ const Sidebar = () => {
               item.to
                 ? pathname === item.to
                 : item.children
-                ? item.children.some((c) => pathname.startsWith(c.to))
-                : false;
+                  ? item.children.some((c) => pathname.startsWith(c.to))
+                  : false;
 
             if (item.children) {
               return (
