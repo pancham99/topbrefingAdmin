@@ -25,7 +25,7 @@ const NewContent = () => {
     const [all_news, set_all_news] = useState([])
     const [writers, setWriters] = useState([])
 
-    const [parPage, setPerPage] = useState(10)
+    const [parPage, setPerPage] = useState(100)
     const [pages, setPages] = useState(0)
     const [page, setPage] = useState(1)
 
