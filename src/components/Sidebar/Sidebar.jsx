@@ -28,6 +28,11 @@ const Sidebar = ({ isSidebarOpen }) => {
       icon: MdOutlineLeaderboard,
     },
     {
+      name: "Manage Roles",
+      href: "/app/roles",
+      icon: MdOutlineLeaderboard,
+    },
+    {
       name: "Publish News",
       href: "/app/publish",
       icon: MdOutlineLeaderboard,

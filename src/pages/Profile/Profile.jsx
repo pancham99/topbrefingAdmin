@@ -1,21 +1,58 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCalendar, FaCheckCircle, FaMailchimp, FaPhone, FaShieldAlt } from 'react-icons/fa';
+import { FaUser, FaGlobe, FaLanguage, FaClock } from 'react-icons/fa';
+
 import { IoSettings } from 'react-icons/io5';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import DetailRow from '../../components/DetailRow/DetailRow';
+import StatusCard from '../../components/StatusCard/StatusCard';
+
+import { updateProfile } from '../../store/slices/userSlice';
+import {getProfile} from '../../store/slices/userSlice';
+import UpdateProfileModal from '../../components/UI/UpdateProfileModal';
+
+
+
+const formatDateTime = (date) => {
+  if (!date) return 'Never';
+  return new Date(date).toLocaleString('en-IN', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+};
+
+const timeAgo = (date) => {
+  if (!date) return '';
+  const diff = Date.now() - new Date(date).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hrs ago`;
+  return `${Math.floor(hrs / 24)} days ago`;
+};
+
+const maskIP = (ip) => {
+  if (!ip) return 'Unknown';
+  const parts = ip.split('.');
+  return parts.length === 4
+    ? `${parts[0]}.xxx.xxx.${parts[3]}`
+    : 'Unknown';
+};
+
+
 
 const Profile = () => {
 
+  const profileData = useSelector((state) => state.user);
+  console.log(profileData,"profileData")
+  const userData = profileData?.profile || [];
+  const dispatch = useDispatch();
 
-  // const selector = useSelector((state)=>state.admin)
-  const profileData = useSelector((state) => state.auth);
-
-
-  const userData = profileData?.loginData?.user || [];
-
-  console.log("selector in profile page", userData)
+  console.log(userData,"profile")
 
   const [activeTab, setActiveTab] = useState('overview');
+  const [showEdit, setShowEdit] = useState(false);
 
   const getInitials = (name) => {
     return name?.split('_').map(n => n[0]).join('').slice(0, 2) || 'SA';
@@ -41,6 +78,17 @@ const Profile = () => {
     return groups;
   };
 
+  const handleUpdate = (data) => {
+    
+    dispatch(updateProfile(data)).then(() => setShowEdit(false));
+  };
+
+
+
+useEffect(() => {
+  dispatch(getProfile());
+}, [dispatch]);
+
   const permissionGroups = groupPermissions(userData?.role_id?.permissions);
 
   return (
@@ -48,20 +96,20 @@ const Profile = () => {
       <div className="">
         {/* Header Card */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-          <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+          <div className="h-32 bg-gradient-to-r from-red-600 to-red-900"></div>
           <div className="px-8 pb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 -mt-16">
               <div className="relative">
-                <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-4xl font-bold shadow-xl border-4 border-white">
+                <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white text-4xl font-bold shadow-xl border-4 border-white">
                   {getInitials(userData.fullName)}
                 </div>
-                {userData.isActive ?  (
+                {userData.isActive ? (
                   <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-4 border-white"></div>
-                ):(
+                ) : (
 
-                
+
                   <div className="absolute bottom-2 right-2 w-6 h-6 bg-red-500 rounded-full border-4 border-white"></div>
-                
+
                 )}
 
                 {/* {userData.isActive && (
@@ -74,7 +122,14 @@ const Profile = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4 sm:mt-0">
                   <div>
                     <h1 className="text-3xl font-bold text-white">{userData?.fullName}</h1>
-                    <p className="text-gray-600 mt-1">@{userData?.username}</p>
+                    <p className="text-white mt-1">@{userData?.username}</p>
+                    <button
+                      onClick={() => setShowEdit(true)}
+                      className="px-4 py-2 bg-white text-red-600 rounded-lg font-medium"
+                    >
+                      Edit Profile
+                    </button>
+
                     <div className="flex flex-wrap gap-2 mt-3">
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
                         <FaShieldAlt className="w-4 h-4" />
@@ -109,8 +164,8 @@ const Profile = () => {
             <button
               onClick={() => setActiveTab('overview')}
               className={`px-6 py-4 font-medium transition-colors ${activeTab === 'overview'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               Overview
@@ -118,11 +173,21 @@ const Profile = () => {
             <button
               onClick={() => setActiveTab('permissions')}
               className={`px-6 py-4 font-medium transition-colors ${activeTab === 'permissions'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               Permissions
+            </button>
+
+            <button
+              onClick={() => setActiveTab('Details')}
+              className={`px-6 py-4 font-medium transition-colors ${activeTab === 'Details'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
+            >
+              Details
             </button>
           </div>
         </div>
@@ -153,7 +218,7 @@ const Profile = () => {
                   <div className="flex-1">
                     <p className="text-sm text-gray-600">Mobile</p>
                     <p className="text-gray-900 font-medium">
-                      {userData?.mobile || 'Not provided'}
+                      {userData?.phone || 'Not provided'}
                     </p>
                   </div>
                 </div>
@@ -229,6 +294,171 @@ const Profile = () => {
             </div>
           </div>
         )}
+
+        {activeTab === 'Details' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            {/* Personal Details */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <FaUser className="text-blue-600" />
+                Personal Details
+              </h2>
+
+              <div className="space-y-4">
+                <DetailRow label="Full Name" value={userData?.fullName} />
+                <DetailRow label="Username" value={`@${userData?.username}`} />
+                <DetailRow
+                  label="Gender"
+                  value={userData?.gender ? userData.gender.replace(/_/g, ' ') : 'Not provided'}
+                />
+                <DetailRow
+                  label="Date of Birth"
+                  value={userData?.dateOfBirth ? formatDate(userData.dateOfBirth) : 'Not provided'}
+                />
+              </div>
+            </div>
+
+            {/* Location & Preferences */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <FaGlobe className="text-green-600" />
+                Location & Preferences
+              </h2>
+
+              <div className="space-y-4">
+                <DetailRow label="Country" value={userData?.country || 'Not provided'} />
+                <DetailRow label="City" value={userData?.city || 'Not provided'} />
+                <DetailRow
+                  label="Language"
+                  value={userData?.language?.toUpperCase() || 'Not set'}
+                  icon={<FaLanguage />}
+                />
+                <DetailRow
+                  label="Timezone"
+                  value={userData?.timezone || 'Not set'}
+                  icon={<FaClock />}
+                />
+              </div>
+            </div>
+
+            {/* Account Status */}
+            <div className="bg-white rounded-xl shadow-md p-6 lg:col-span-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <FaShieldAlt className="text-purple-600" />
+                Account Status
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <StatusCard
+                  label="Email Verified"
+                  value={userData?.isEmailVerified}
+                />
+                <StatusCard
+                  label="Phone Verified"
+                  value={userData?.isPhoneVerified}
+                />
+                <StatusCard
+                  label="Two Factor Auth"
+                  value={userData?.twoFactorEnabled}
+                />
+              </div>
+
+              {/* Login & Security Activity */}
+              <div className="bg-white rounded-xl shadow-md p-6 lg:col-span-2 mt-5">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <FaClock className="text-red-600" />
+                  Login & Security Activity
+                </h2>
+
+                {userData?.loginHistory?.length > 0 ? (
+                  (() => {
+                    const lastLogin =
+                      userData.loginHistory[userData.loginHistory.length - 1];
+
+                    return (
+                      <>
+                        {/* Quick Stats */}
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+                          <StatusCard
+                            label="Total Logins"
+                            value={userData.loginHistory.length}
+                          />
+                          <StatusCard
+                            label="Last Login"
+                            value={timeAgo(userData.lastLogin)}
+                          />
+                          <StatusCard
+                            label="Device"
+                            value={lastLogin?.userAgent?.split(')')[0] + ')'}
+                          />
+                          <StatusCard
+                            label="IP Address"
+                            value={maskIP(lastLogin?.ip)}
+                          />
+                        </div>
+
+                        {/* Recent Login Table */}
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="bg-gray-100 text-gray-600">
+                                <th className="text-left px-4 py-2">Time</th>
+                                {/* <th className="text-left px-4 py-2">Location</th> */}
+                                <th className="text-left px-4 py-2">Device</th>
+                                <th className="text-left px-4 py-2">IP</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {userData.loginHistory
+                                .slice(-5)
+                                .reverse()
+                                .map((login, idx) => (
+                                  <tr
+                                    key={idx}
+                                    className="border-b last:border-b-0 hover:bg-gray-50"
+                                  >
+                                    <td className="px-4 py-2">
+                                      {formatDateTime(login.loginAt)}
+                                    </td>
+                                    {/* <td className="px-4 py-2">
+                                      {login.location || 'Unknown'}
+                                    </td> */}
+                                    <td className="px-4 py-2 truncate max-w-xs">
+                                      {login.userAgent}
+                                    </td>
+                                    <td className="px-4 py-2">
+                                      {maskIP(login.ip)}
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </>
+                    );
+                  })()
+                ) : (
+                  <p className="text-gray-500 text-sm">
+                    No login activity recorded yet.
+                  </p>
+                )}
+              </div>
+
+            </div>
+          </div>
+        )}
+
+
+        {showEdit && (
+          <UpdateProfileModal
+            user={userData}
+            loading={profileData.loading}
+            onSubmit={handleUpdate}
+            onClose={() => setShowEdit(false)}
+          />
+        )}
+
       </div>
     </div>
   );

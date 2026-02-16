@@ -28,25 +28,53 @@ const axiosPrivate = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// axiosPrivate.interceptors.request.use(
+//   (config) => {
+//     const adminData = localStorage.getItem("adminData");
+
+//     let parsedToken = null;
+//     try {
+//       parsedToken = JSON.parse(adminData);
+//     } catch {
+//       console.error("Failed to parse adminData from localStorage");
+//     }
+    
+
+//     const token = parsedToken?.token;
+
+//     if (token) config.headers.Authorization = `Bearer ${token}`;
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
+
+
 axiosPrivate.interceptors.request.use(
   (config) => {
     const adminData = localStorage.getItem("adminData");
 
-    let parsedToken = null;
-    try {
-      parsedToken = JSON.parse(adminData);
-    } catch {
-      console.error("Failed to parse adminData from localStorage");
+    if (adminData) {
+      try {
+        const parsed = JSON.parse(adminData);
+
+        const token =
+          parsed?.accessToken ||
+          parsed?.data?.accessToken ||
+          parsed?.token;
+
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (e) {
+        console.error("Invalid adminData in localStorage");
+      }
     }
-    
 
-    const token = parsedToken?.token;
-
-    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
 );
+
 
 // ------------------------------------------------------
 // PUBLIC API Thunk
@@ -76,39 +104,62 @@ export const createApiThunkPublic = (typePrefix, url, method = "GET") =>
 // ------------------------------------------------------
 // PRIVATE API Thunk
 // ------------------------------------------------------
+// export const createApiThunkPrivate = (typePrefix, url, method = "GET") =>
+//   createAsyncThunk(typePrefix, async (payload = {}, { rejectWithValue }) => {
+//     try {
+//       const res = await axiosPrivate.request({
+//         url,
+//         method,
+//         data: method !== "GET" ? payload : undefined,
+//         params: method === "GET" ? payload : undefined,
+//       });
+
+//       return res?.data;
+//     } catch (err) {
+//       const errorData = err.response?.data || {
+//         message: err.message,
+//         code: 500,
+//       };
+
+//       console.error("Private API Error:", errorData);
+
+//       if (errorData.code === 1401) {
+//         localStorage.clear();
+//         sessionStorage.clear();
+//         window.location.href = "/login";
+//         return rejectWithValue({
+//           message: "Session expired. Please login again.",
+//         });
+//       }
+
+//       toast.error(errorData?.message || "Something went wrong.");
+
+//       return rejectWithValue(errorData);
+//     }
+//   });
+
 export const createApiThunkPrivate = (typePrefix, url, method = "GET") =>
   createAsyncThunk(typePrefix, async (payload = {}, { rejectWithValue }) => {
     try {
+      const finalUrl =
+        typeof url === "function" ? url(payload) : url;
+
       const res = await axiosPrivate.request({
-        url,
+        url: finalUrl,
         method,
         data: method !== "GET" ? payload : undefined,
-        params: method === "GET" ? payload : undefined,
+        params:
+          method === "GET" && typeof payload === "object"
+            ? payload
+            : undefined,
       });
 
-      return res?.data;
+      return res.data;
     } catch (err) {
-      const errorData = err.response?.data || {
-        message: err.message,
-        code: 500,
-      };
-
-      console.error("Private API Error:", errorData);
-
-      if (errorData.code === 1401) {
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.href = "/login";
-        return rejectWithValue({
-          message: "Session expired. Please login again.",
-        });
-      }
-
-      toast.error(errorData?.message || "Something went wrong.");
-
-      return rejectWithValue(errorData);
+      return rejectWithValue(err.response?.data || { message: err.message });
     }
   });
+
 
 // ------------------------------------------------------
 // Extra Reducer Helper

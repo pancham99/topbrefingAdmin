@@ -1,20 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { FaBars, FaUser, FaSignOutAlt, FaBell } from "react-icons/fa";
 import { RiArrowDownSFill } from "react-icons/ri";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
+
+import { logout } from "../../store/slices/authSlice";
 
 const Header = ({ setIsSidebarOpen }) => {
   const [openDropdown, setOpenDropdown] = useState(false);
-   const profileData = useSelector((state) => state.auth);
+  const profileData = useSelector((state) => state.auth);
   const userData = profileData?.loginData?.user || [];
   const navigate = useNavigate();
   const location = useLocation();
+    const dispatch = useDispatch();
   const dropdownRef = useRef(null);
   const handleToggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const handleProfile = () => navigate("/app/profile");
 
-    useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setOpenDropdown(false);
@@ -27,16 +30,23 @@ const Header = ({ setIsSidebarOpen }) => {
     };
   }, []);
 
-  const pageTitles = {
-    "/app/dashboard": "Dashboard",
-     "/app/users": "Users",
-     "/app/publish": "Publish",
-      "/app/profile": "Profile",
 
-   
+  const handleLogout = async () => {
+    await dispatch(logout());
+    window.location.href = "/login";
   };
 
-   const title = pageTitles[location.pathname] || "";
+  const pageTitles = {
+    "/app/dashboard": "Dashboard",
+    "/app/users": "Users",
+    "/app/publish": "Publish",
+    "/app/profile": "Profile",
+    "/app/roles": "Roles Management",
+
+
+  };
+
+  const title = pageTitles[location.pathname] || "";
 
   return (
     <header className="sticky top-0 flex w-full  z-50 py-2 bg-white">
@@ -67,7 +77,7 @@ const Header = ({ setIsSidebarOpen }) => {
             /> */}
             <div className="hidden lg:block text-left">
               <p className="text-sm font-medium  hover:text-white whitespace-nowrap">
-               {userData?.fullName}
+                {userData?.fullName}
               </p>
             </div>
             <RiArrowDownSFill className="hidden hover:text-white lg:block w-4 h-4 text-[#5041BC]" />
@@ -87,7 +97,7 @@ const Header = ({ setIsSidebarOpen }) => {
                 </button>
 
                 <button
-                  // onClick={handleLogout}
+                  onClick={handleLogout}
                   className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                 >
                   <FaSignOutAlt className="w-4 h-4 mr-2" /> Logout

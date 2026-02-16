@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createApiThunkPublic } from '../../api/axios';
+import { createApiThunkPublic, createApiThunkPrivate } from '../../api/axios';
 
 const getInitialState = () => {
   const adminData = localStorage.getItem('adminData');
@@ -12,6 +12,10 @@ const getInitialState = () => {
     // 👇 email verification state
     emailVerified: false,
 
+    forgotPasswordSuccess: false,
+    resetPasswordSuccess: false,
+    changePasswordSuccess: false,
+
 
   };
 };
@@ -23,12 +27,51 @@ export const register = createApiThunkPublic('register', '/auth/register', 'POST
 // ✅ ADD THIS
 export const verifyEmail = createApiThunkPublic('verifyEmail', '/auth/verify-email', 'GET');
 
+export const logout = createApiThunkPrivate('logout', '/auth/logout', 'POST');
+
+export const verifyUserEmail = createApiThunkPrivate(
+  "users/verifyEmail",
+  "/auth/verify-email",
+  "POST"
+);
+
+// 🔑 Forgot Password
+export const forgotPassword = createApiThunkPublic(
+  "auth/forgotPassword",
+  "/auth/forgot-password",
+  "POST"
+);
+
+// 🔁 Reset Password (token based)
+export const resetPassword = createApiThunkPublic(
+  "auth/resetPassword",
+  "/auth/reset-password",
+  "POST"
+);
+
+
+// 🔒 Change Password (logged-in user)
+export const changePassword = createApiThunkPrivate(
+  "auth/changePassword",
+  "/auth/change-password",
+  "POST"
+);
+
+
+
+
+
+
 const authSlice = createSlice({
   name: 'authorization',
   initialState: getInitialState(),
   reducers: {
     resetEmailVerification: (state) => {
       state.emailVerified = false;
+
+      state.forgotPasswordSuccess = false;
+      state.resetPasswordSuccess = false;
+      state.changePasswordSuccess = false;
       state.error = null;
     },
   },
@@ -96,6 +139,72 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       });
+
+    // logout
+    builder
+      .addCase(logout.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.loading = false;
+        state.loginData = null;
+        state.isAuthenticated = false;
+        localStorage.removeItem('adminData');
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+
+
+    /* ========== FORGOT PASSWORD ========== */
+    builder
+      .addCase(forgotPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.loading = false;
+        state.forgotPasswordSuccess = true;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+
+
+    /* ========== RESET PASSWORD ========== */
+    builder
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.loading = false;
+        state.resetPasswordSuccess = true;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+
+
+    /* ========== CHANGE PASSWORD ========== */
+    builder
+      .addCase(changePassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.loading = false;
+        state.changePasswordSuccess = true;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+
   },
 });
 

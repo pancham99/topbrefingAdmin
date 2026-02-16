@@ -6,9 +6,11 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Users from "./pages/Users/Users";
 import Publish from "./pages/Publish/Publish";
 import Profile from "./pages/Profile/Profile";
+import Roles from "./pages/Roles/Roles";
 import { Toaster } from "react-hot-toast";
 import EmailVerify from "./components/EmailVerify/EmailVerify";
 import EmailVerifyCheck from "./components/EmailVerifyCheck/EmailVerifyCheck";
+import UserDetails from "./pages/UserDetails/UserDetails";
 
 // ================= PUBLIC ROUTE =================
 const PublicRoute = () => {
@@ -39,8 +41,11 @@ const App = () => {
           <Route path="/app" element={<Layout />}>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<Users />} />
+            <Route path="roles" element={<Roles />} />
             <Route path="publish" element={<Publish />} />
             <Route path="profile" element={<Profile />} />
+
+              <Route path="users/:userId" element={<UserDetails />} />
           </Route>
         </Route>
 
