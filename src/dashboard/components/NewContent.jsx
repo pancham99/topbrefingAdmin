@@ -21,11 +21,12 @@ const NewContent = () => {
 
     const { store } = useContext(storeContext)
     const [news, setNews] = useState([])
-    console.log(news, "news gg")
+    
     const [all_news, set_all_news] = useState([])
+    console.log(all_news, "news gg")
     const [writers, setWriters] = useState([])
 
-    const [parPage, setPerPage] = useState(100)
+    const [parPage, setPerPage] = useState(20)
     const [pages, setPages] = useState(0)
     const [page, setPage] = useState(1)
 

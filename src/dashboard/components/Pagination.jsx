@@ -13,17 +13,18 @@ const Pagination = ({parPage, news, page, pages, setPerPage, setPage}) => {
 
 
                     }} name='category' id='category' type='text' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10'>
+                        <option value="20">20</option>
+                        <option value="40">40</option>
+                        <option value="60">60</option>
+                        <option value="80">80</option>
                         <option value="100">100</option>
+                        <option value="120">120</option>
+                        <option value="140">140</option>
+                        <option value="160">160</option>
+                        <option value="180">180</option>
                         <option value="200">200</option>
-                        <option value="300">300 </option>
-                        <option value="400">400</option>
-                        <option value="500">500</option>
-                        <option value="600">600</option>
-                        <option value="700">700</option>
-                        <option value="800">800</option>
-                        <option value="900">900</option>
-                        <option value="1000">1000</option>
-                        <option value="1100">1100</option>
+                        <option value="250">250</option>
+                        <option value="300">300</option>
                     </select>
                 </div>
                 <p className='px-6 py-3 font-semibold text-sm'>{(page - 1) * parPage + 1}/{news.length} - of {pages}</p>
