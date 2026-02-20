@@ -125,7 +125,7 @@ const Sidebar = () => {
           ]
           : [
             { id: "news-list", label: "All News", to: "/dashboard/news", icon: <BiNews /> },
-            // { id: "news-create", label: "Add News", to: "/dashboard/news/create", icon: <FaPlus /> },
+            { id: "news-create", label: "Add News", to: "/dashboard/news/create", icon: <FaPlus /> },
           ],
       },
       {
