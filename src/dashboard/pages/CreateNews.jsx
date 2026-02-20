@@ -55,7 +55,7 @@ const CreateNews = () => {
 
     try {
       setLoader(true)
-      const { data } = await axios.post(`${base_url}/api/news/add`, formData, {
+      const { data } = await axios.post(`http://localhost:5000/api/news/add`, formData, {
         headers: {
           'Authorization': `Bearer ${store.token}`
         }
