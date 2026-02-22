@@ -103,7 +103,7 @@ const CreateNews = () => {
       }
 
       setImageLoader(true)
-      const { data } = await axios.post(`${base_url}/api/images/add`, formData, {
+      const { data } = await axios.post(`${base_url}/api//images//add`, formData, {
         headers: {
           'Authorization': `Bearer ${store.token}`
         }
