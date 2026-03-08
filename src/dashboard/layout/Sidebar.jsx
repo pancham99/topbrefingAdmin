@@ -112,6 +112,8 @@ const Sidebar = () => {
           { id: "ads", label: "Advertisement", to: "/dashboard/advertisement", icon: <FcAdvertising /> },
           { id: "aadvideo", label: "Add Video", to: "/dashboard/addVideoContent", icon: <FcAdvertising /> },
           { id: "video", label: " Video", to: "/dashboard/videos", icon: <FcAdvertising /> },
+          { id: "addyoutubeVideo", label: "Add Youtube Video", to: "/dashboard/addyoutubeVideo", icon: <FcAdvertising /> },
+          { id: "allyoutubeVideo", label: "All Youtube Video", to: "/dashboard/allyoutubeVideo", icon: <FcAdvertising /> },
         ],
       },
       {

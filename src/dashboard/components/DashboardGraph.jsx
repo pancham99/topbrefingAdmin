@@ -18,7 +18,7 @@ const DashboardGraph = ({ loading }) => {
 
   const get_news = async () => {
     try {
-      const { data } = await axios.get(`${base_url}/api/news`, {
+      const { data } = await axios.get("http://localhost:5000/api/news", {
         headers: { 'Authorization': `Bearer ${store.token}` }
       });
       set_all_news(data.news);
@@ -29,7 +29,7 @@ const DashboardGraph = ({ loading }) => {
 
   const get_writes = async () => {
     try {
-      const { data } = await axios.get(`${base_url}/api/news/writers`, {
+      const { data } = await axios.get("http://localhost:5000/api/news/writers", {
         headers: { 'Authorization': `Bearer ${store.token}` }
       });
       set_all_writes(data.writers);

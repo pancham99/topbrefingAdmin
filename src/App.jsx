@@ -26,6 +26,8 @@ import Advertisement_edit from './dashboard/pages/Advertisement_edit';
 import ServerDown from './dashboard/pages/ServerDown';
 import Subscribers from './dashboard/pages/Subscribe';
 import VideoContents from './dashboard/components/VideoContents';
+import AddyoutubeVideo from './dashboard/pages/AddyoutubeVideo';
+import AllyoutubeVideo from './dashboard/pages/AllyoutubeVideo';
 
 
 function App() {
@@ -80,8 +82,9 @@ function App() {
               <Route path="advertisement" element={<Addvertai />} />
               <Route path="advertisement_edit/:_id" element={<Advertisement_edit />} />
               <Route path="videos" element={<VideoContents/>} />
-
-
+              <Route path="addyoutubeVideo" element={<AddyoutubeVideo />} />
+                <Route path="allyoutubeVideo" element={<AllyoutubeVideo />} />
+              
               
             </Route>
 
