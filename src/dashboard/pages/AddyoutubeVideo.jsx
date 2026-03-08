@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-
+import { base_url } from "../../config/config";
 export default function AddVideo() {
   const [title, setTitle] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
@@ -19,7 +19,7 @@ export default function AddVideo() {
       setLoading(true);
       setMessage("");
 
-      const res = await fetch("http://localhost:5000/api/youtube/add", {
+      const res = await fetch(`${base_url}/api/youtube/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

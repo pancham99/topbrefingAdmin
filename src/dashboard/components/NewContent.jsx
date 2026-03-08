@@ -169,7 +169,7 @@ const NewContent = () => {
                 <th className="px-7 py-3">Title</th>
                 <th className="px-7 py-3">Image</th>
                 <th className="px-7 py-3">Category</th>
-                <th className="px-7 py-3">Description</th>
+                {/* <th className="px-7 py-3">Description</th> */}
                 <th className="px-7 py-3">Date</th>
                 <th className="px-7 py-3">Time</th>
                 <th className="px-7 py-3">Status</th>
@@ -201,9 +201,9 @@ const NewContent = () => {
 
                   <td className="px-6 py-4">{n.category}</td>
 
-                  <td className="px-6 py-4">
+                  {/* <td className="px-6 py-4">
                     {stripHTML(n.description)?.slice(0, 30)}...
-                  </td>
+                  </td> */}
 
                   <td className="px-6 py-4">{n.date}</td>
 
