@@ -1,8 +1,6 @@
-import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
-import storeContext from '../../context/storeContext';
+
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-import { base_url } from '../../config/config';
+
 import SkeletonBox from './SkeletonBox';
 
 const COLORS = {
@@ -11,44 +9,13 @@ const COLORS = {
   deactive: "#F44336"
 };
 
-const DashboardGraph = ({ loading }) => {
-  const { store } = useContext(storeContext);
-  const [all_news, set_all_news] = useState([]);
-  const [all_writes, set_all_writes] = useState([]);
+const DashboardGraph = ({ loading, item }) => {
+  const pendingNews = item?.pendingNews;;
+  const activeNews = item?.activeNews;
+  const deactiveNews = item?.deactiveNews;
 
-  const get_news = async () => {
-    try {
-      const { data } = await axios.get("http://localhost:5000/api/news", {
-        headers: { 'Authorization': `Bearer ${store.token}` }
-      });
-      set_all_news(data.news);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  const get_writes = async () => {
-    try {
-      const { data } = await axios.get("http://localhost:5000/api/news/writers", {
-        headers: { 'Authorization': `Bearer ${store.token}` }
-      });
-      set_all_writes(data.writers);
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
-  useEffect(() => {
-    get_news();
-    get_writes();
-  }, []);
-
-  const pendingNews = all_news.filter(news => news.status === "pending").length;
-  const activeNews = all_news.filter(news => news.status === "active").length;
-  const deactiveNews = all_news.filter(news => news.status === "deactive").length;
-
-  const activeWriter = all_writes.filter(writer => writer.status === "active").length;
-  const deactiveWriter = all_writes.filter(writer => writer.status === "deactive").length;
+  const activeWriter = item?.activeWriter;
+  const deactiveWriter = item?.deactiveWriter;
 
   const newsData = [
     { name: "Active News", value: activeNews, color: COLORS.active },
