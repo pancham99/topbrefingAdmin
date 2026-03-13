@@ -111,7 +111,6 @@ const NewContent = () => {
 
   // Update Status
   const update_status = async (status, id) => {
-
     try {
 
       const { data } = await axios.put(
@@ -136,6 +135,48 @@ const NewContent = () => {
       toast.error(error.response?.data?.message);
     }
   };
+
+
+
+const update_types = async (type, id) => {
+
+  try {
+
+    const payload = {
+      isBreaking: false,
+      isTrending: false,
+      isFeatured: false,
+      isPopular: false
+    };
+
+    if (type === "breaking") payload.isBreaking = true;
+    if (type === "trending") payload.isTrending = true;
+    if (type === "featured") payload.isFeatured = true;
+    if (type === "popular") payload.isPopular = true;
+
+    const { data } = await axios.put(
+      `${base_url}/api/news/types-update/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${store.token}`
+        }
+      }
+    );
+
+    toast.success(data.message);
+
+    setNews(prev =>
+      prev.map(n =>
+        n._id === id ? { ...n, ...payload } : n
+      )
+    );
+
+  } catch (error) {
+    toast.error(error.response?.data?.message);
+  }
+
+};
 
   return (
 
@@ -173,6 +214,7 @@ const NewContent = () => {
                 <th className="px-7 py-3">Date</th>
                 <th className="px-7 py-3">Time</th>
                 <th className="px-7 py-3">Status</th>
+                <th className="px-7 py-3">Type</th>
                 <th className="px-7 py-3">Action</th>
               </tr>
             </thead>
@@ -230,6 +272,34 @@ const NewContent = () => {
                     ) : (
                       <span>{n.status}</span>
                     )}
+
+                  </td>
+
+                  <td className="px-6 py-4">
+
+                    <select
+                      className="border rounded px-2 py-1 text-xs"
+                      value={
+                        n.isBreaking
+                          ? "breaking"
+                          : n.isTrending
+                            ? "trending"
+                            : n.isFeatured
+                              ? "featured"
+                              : n.isPopular
+                                ? "popular"
+                                : "none"
+                      }
+                      onChange={(e) => update_types(e.target.value, n._id)}
+                    >
+
+                      <option value="none">None</option>
+                      <option value="breaking">Breaking</option>
+                      <option value="trending">Trending</option>
+                      <option value="featured">Featured</option>
+                      <option value="popular">Popular</option>
+
+                    </select>
 
                   </td>
 
