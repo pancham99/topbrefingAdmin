@@ -25,6 +25,16 @@ const NewContent = () => {
 
   const [loading, setLoading] = useState(false);
 
+
+
+  const getCurrentType = (n) => {
+    if (n.isBreaking) return "breaking";
+    if (n.isTrending) return "trending";
+    if (n.isFeatured) return "featured";
+    if (n.isPopular) return "popular";
+    return "none";
+  };
+
   // Fetch News
   const get_news = async () => {
     try {
@@ -138,45 +148,45 @@ const NewContent = () => {
 
 
 
-const update_types = async (type, id) => {
+  const update_types = async (type, id) => {
 
-  try {
+    try {
 
-    const payload = {
-      isBreaking: false,
-      isTrending: false,
-      isFeatured: false,
-      isPopular: false
-    };
+      const payload = {
+        isBreaking: false,
+        isTrending: false,
+        isFeatured: false,
+        isPopular: false
+      };
 
-    if (type === "breaking") payload.isBreaking = true;
-    if (type === "trending") payload.isTrending = true;
-    if (type === "featured") payload.isFeatured = true;
-    if (type === "popular") payload.isPopular = true;
+      if (type === "breaking") payload.isBreaking = true;
+      if (type === "trending") payload.isTrending = true;
+      if (type === "featured") payload.isFeatured = true;
+      if (type === "popular") payload.isPopular = true;
 
-    const { data } = await axios.put(
-      `${base_url}/api/news/types-update/${id}`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${store.token}`
+      const { data } = await axios.put(
+        `${base_url}/api/news/types-update/${id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${store.token}`
+          }
         }
-      }
-    );
+      );
 
-    toast.success(data.message);
+      toast.success(data.message);
 
-    setNews(prev =>
-      prev.map(n =>
-        n._id === id ? { ...n, ...payload } : n
-      )
-    );
+      setNews(prev =>
+        prev.map(n =>
+          n._id === id ? { ...n, ...payload } : n
+        )
+      );
 
-  } catch (error) {
-    toast.error(error.response?.data?.message);
-  }
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+    }
 
-};
+  };
 
   return (
 
@@ -278,18 +288,9 @@ const update_types = async (type, id) => {
                   <td className="px-6 py-4">
 
                     <select
-                      className="border rounded px-2 py-1 text-xs"
-                      value={
-                        n.isBreaking
-                          ? "breaking"
-                          : n.isTrending
-                            ? "trending"
-                            : n.isFeatured
-                              ? "featured"
-                              : n.isPopular
-                                ? "popular"
-                                : "none"
-                      }
+                      className="border border-gray-300 bg-white rounded-md px-3 py-1 text-xs
+  focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+                      value={getCurrentType(n)}
                       onChange={(e) => update_types(e.target.value, n._id)}
                     >
 
