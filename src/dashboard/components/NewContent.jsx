@@ -14,6 +14,7 @@ import Pagination from "./Pagination";
 
 import moment from "moment-timezone";
 import FilterDate from "./fillter/FilterDate";
+import FilterType from "./fillter/FilterType";
 
 const NewContent = () => {
 
@@ -33,6 +34,7 @@ const NewContent = () => {
   const [search, setSearch] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [type, setType] = useState("");
 
 
   const getCurrentType = (n) => {
@@ -43,42 +45,7 @@ const NewContent = () => {
     return "none";
   };
 
-  // 🚀 Fetch News
-  // const get_news = async () => {
 
-  //   try {
-
-  //     setLoading(true);
-
-  //     const query = new URLSearchParams({
-  //       page,
-  //       limit: parPage,
-  //       status,
-  //       category,
-  //       writerName: writer,
-  //       search
-  //     });
-
-  //     const { data } = await axios.get(
-  //       `${base_url}/api/news?${query.toString()}`,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${store.token}`
-  //         }
-  //       }
-  //     );
-
-  //     setNews(data.news);
-  //     setPages(data.pages);
-
-  //     setLoading(false);
-
-  //   } catch (error) {
-  //     setLoading(false);
-  //     console.log(error.message);
-  //   }
-
-  // };
 
 
   const get_news = async () => {
@@ -95,7 +62,8 @@ const NewContent = () => {
         writerName: writer,
         search,
         startDate,
-        endDate
+        endDate,
+        type
       });
 
       const { data } = await axios.get(
@@ -139,7 +107,7 @@ const NewContent = () => {
 
   useEffect(() => {
     get_news();
-  }, [page, parPage, status, category, writer, startDate, endDate, search]);
+  }, [page, parPage, status, category, writer, startDate, endDate, search, type]);
 
   useEffect(() => {
     get_writers();
@@ -247,6 +215,16 @@ const NewContent = () => {
   return (
 
     <div>
+      <div className="w-full px-4">
+        <span className='text-gray-800 font-semibold text-sm'>Search</span>
+        <input
+          type="text"
+          placeholder="Search news"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="lg:px-3 w-full py-2 rounded-md border border-gray-300 focus:border-green-500 outline-0"
+        />
+      </div>
 
       {/* Filters */}
       <div className="px-4 py-3 lg:flex gap-x-3 space-y-3 lg:space-y-0">
@@ -255,10 +233,12 @@ const NewContent = () => {
 
         <FillterCategory setCategory={setCategory} />
 
+        <FilterType setType={setType} />
+
         <FillterWriters writers={writers} setWriter={setWriter} />
 
         <FilterDate
-     
+
           value={startDate}
           onChange={setStartDate}
           placeholder="Start Date"
@@ -271,16 +251,7 @@ const NewContent = () => {
         />
 
 
-    <div className="w-full">
-      <span className='text-gray-800 font-semibold text-sm'>Search</span>
-          <input
-          type="text"
-          placeholder="Search news"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="lg:px-3 w-full py-2 rounded-md border border-gray-300 focus:border-green-500 outline-0"
-        />
-    </div>
+
 
       </div>
 

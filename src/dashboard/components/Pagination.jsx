@@ -16,21 +16,7 @@ const Pagination = ({ page, pages, parPage, setPage, setPerPage }) => {
       {/* Per Page */}
       <div className="flex items-center gap-3">
 
-        <p className="text-sm font-semibold">News per page</p>
-
-        <select
-          value={parPage}
-          onChange={(e) => {
-            setPerPage(parseInt(e.target.value));
-            setPage(1);
-          }}
-          className="border px-2 py-1 rounded"
-        >
-          <option value="20">20</option>
-          <option value="40">40</option>
-          <option value="60">60</option>
-          <option value="100">100</option>
-        </select>
+        <p className="text-sm font-semibold"> Page No. {page}</p>
 
       </div>
 
