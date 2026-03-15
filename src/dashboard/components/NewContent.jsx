@@ -12,19 +12,27 @@ import FillterCategory from "./fillter/FillterCategory";
 import FillterWriters from "./fillter/FillterWriters";
 import Pagination from "./Pagination";
 
+import moment from "moment-timezone";
+import FilterDate from "./fillter/FilterDate";
+
 const NewContent = () => {
 
   const { store } = useContext(storeContext);
 
   const [news, setNews] = useState([]);
   const [writers, setWriters] = useState([]);
-
   const [parPage, setPerPage] = useState(20);
   const [pages, setPages] = useState(0);
   const [page, setPage] = useState(1);
-
   const [loading, setLoading] = useState(false);
 
+  // 🔥 Filters State
+  const [status, setStatus] = useState("");
+  const [category, setCategory] = useState("");
+  const [writer, setWriter] = useState("");
+  const [search, setSearch] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
 
   const getCurrentType = (n) => {
@@ -35,14 +43,63 @@ const NewContent = () => {
     return "none";
   };
 
-  // Fetch News
+  // 🚀 Fetch News
+  // const get_news = async () => {
+
+  //   try {
+
+  //     setLoading(true);
+
+  //     const query = new URLSearchParams({
+  //       page,
+  //       limit: parPage,
+  //       status,
+  //       category,
+  //       writerName: writer,
+  //       search
+  //     });
+
+  //     const { data } = await axios.get(
+  //       `${base_url}/api/news?${query.toString()}`,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${store.token}`
+  //         }
+  //       }
+  //     );
+
+  //     setNews(data.news);
+  //     setPages(data.pages);
+
+  //     setLoading(false);
+
+  //   } catch (error) {
+  //     setLoading(false);
+  //     console.log(error.message);
+  //   }
+
+  // };
+
+
   const get_news = async () => {
+
     try {
 
       setLoading(true);
 
+      const query = new URLSearchParams({
+        page,
+        limit: parPage,
+        status,
+        category,
+        writerName: writer,
+        search,
+        startDate,
+        endDate
+      });
+
       const { data } = await axios.get(
-        `${base_url}/api/news?page=${page}&limit=${parPage}`,
+        `${base_url}/api/news?${query.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${store.token}`
@@ -61,8 +118,9 @@ const NewContent = () => {
     }
   };
 
-  // Fetch Writers
+  // 🔥 Fetch Writers
   const get_writers = async () => {
+
     try {
 
       const { data } = await axios.get(`${base_url}/api/news/writers`, {
@@ -76,27 +134,23 @@ const NewContent = () => {
     } catch (error) {
       console.log(error);
     }
+
   };
 
   useEffect(() => {
     get_news();
-  }, [page, parPage]);
+  }, [page, parPage, status, category, writer, startDate, endDate, search]);
 
   useEffect(() => {
     get_writers();
   }, []);
 
-  // Fast time format
+  // Format Time
   const formatTime = (date) => {
     return new Date(date).toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit"
     });
-  };
-
-  // Remove HTML tags
-  const stripHTML = (html) => {
-    return html?.replace(/<[^>]+>/g, "");
   };
 
   // Delete News
@@ -117,10 +171,12 @@ const NewContent = () => {
     } catch (error) {
       console.log(error);
     }
+
   };
 
   // Update Status
   const update_status = async (status, id) => {
+
     try {
 
       const { data } = await axios.put(
@@ -144,10 +200,10 @@ const NewContent = () => {
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
+
   };
 
-
-
+  // Update Types
   const update_types = async (type, id) => {
 
     try {
@@ -194,15 +250,38 @@ const NewContent = () => {
 
       {/* Filters */}
       <div className="px-4 py-3 lg:flex gap-x-3 space-y-3 lg:space-y-0">
-        <FillterStatus />
-        <FillterCategory />
-        <FillterWriters writers={writers} />
 
-        <input
+        <FillterStatus setStatus={setStatus} />
+
+        <FillterCategory setCategory={setCategory} />
+
+        <FillterWriters writers={writers} setWriter={setWriter} />
+
+        <FilterDate
+     
+          value={startDate}
+          onChange={setStartDate}
+          placeholder="Start Date"
+        />
+
+        <FilterDate
+          value={endDate}
+          onChange={setEndDate}
+          placeholder="End Date"
+        />
+
+
+    <div className="w-full">
+      <span className='text-gray-800 font-semibold text-sm'>Search</span>
+          <input
           type="text"
           placeholder="Search news"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="lg:px-3 w-full py-2 rounded-md border border-gray-300 focus:border-green-500 outline-0"
         />
+    </div>
+
       </div>
 
       {/* Table */}
@@ -217,10 +296,10 @@ const NewContent = () => {
             <thead className="text-xs uppercase bg-gray-50">
               <tr>
                 <th className="px-7 py-3">No</th>
+                {/* <th className="px-7 py-3">Writer</th> */}
                 <th className="px-7 py-3">Title</th>
                 <th className="px-7 py-3">Image</th>
                 <th className="px-7 py-3">Category</th>
-                {/* <th className="px-7 py-3">Description</th> */}
                 <th className="px-7 py-3">Date</th>
                 <th className="px-7 py-3">Time</th>
                 <th className="px-7 py-3">Status</th>
@@ -243,6 +322,10 @@ const NewContent = () => {
                     {n.title?.slice(0, 20)}...
                   </td>
 
+                  {/* <td className="px-6 py-4">
+                    {n.writerName}
+                  </td> */}
+
                   <td className="px-6 py-4">
                     <img
                       src={n.image}
@@ -253,11 +336,12 @@ const NewContent = () => {
 
                   <td className="px-6 py-4">{n.category}</td>
 
-                  {/* <td className="px-6 py-4">
-                    {stripHTML(n.description)?.slice(0, 30)}...
-                  </td> */}
-
-                  <td className="px-6 py-4">{n.date}</td>
+                  <td className="px-6 py-4">
+                    {moment
+                      .utc(n?.createdAt)
+                      .tz("Asia/Kolkata")
+                      .format("DD MMM YYYY")}
+                  </td>
 
                   <td className="px-6 py-4">
                     {formatTime(n.createdAt)}
@@ -289,7 +373,7 @@ const NewContent = () => {
 
                     <select
                       className="border border-gray-300 bg-white rounded-md px-3 py-1 text-xs
-  focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+                      focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
                       value={getCurrentType(n)}
                       onChange={(e) => update_types(e.target.value, n._id)}
                     >
