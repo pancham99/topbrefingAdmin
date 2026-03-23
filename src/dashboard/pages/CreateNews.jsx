@@ -45,8 +45,6 @@ const CreateNews = () => {
 
   const added = async (e) => {
     e.preventDefault()
-
-
     const formData = new FormData()
     formData.append('title', title)
     formData.append('image', image)
@@ -55,7 +53,7 @@ const CreateNews = () => {
 
     try {
       setLoader(true)
-      const { data } = await axios.post(`http://localhost:5000/api/news/add`, formData, {
+      const { data } = await axios.post(`${base_url}/api/news/add`, formData, {
         headers: {
           'Authorization': `Bearer ${store.token}`
         }
