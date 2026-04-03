@@ -421,13 +421,15 @@ const NewContent = () => {
 
       </div>
 
-      <Pagination
-        parPage={parPage}
-        page={page}
-        pages={pages}
-        setPerPage={setPerPage}
-        setPage={setPage}
-      />
+      <div className="flex items-center justify-end px-4 py-2 mx-auto max-w-2xl">
+        <Pagination
+          parPage={parPage}
+          page={page}
+          pages={pages}
+          setPerPage={setPerPage}
+          setPage={setPage}
+        />
+      </div>
 
     </div>
 
