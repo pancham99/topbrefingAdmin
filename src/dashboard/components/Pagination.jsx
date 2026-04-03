@@ -1,66 +1,104 @@
 import React from "react";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
-const Pagination = ({ page, pages, parPage, setPage, setPerPage }) => {
+// const name = "MADHUSUDAN".split("");
+const name = "TOPBREFING".split("");
 
-  const pageNumbers = [];
+const Pagination = ({ page, pages, setPage }) => {
 
-  for (let i = 1; i <= pages; i++) {
-    pageNumbers.push(i);
-  }
+  const getPageNumbers = () => {
+    const totalVisible = name.length; // 10 letters
+    const pagesArr = [];
+
+    let start = Math.max(1, page - Math.floor(totalVisible / 2));
+    let end = start + totalVisible - 1;
+
+    if (end > pages) {
+      end = pages;
+      start = Math.max(1, end - totalVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pagesArr.push(i);
+    }
+
+    return pagesArr;
+  };
+
+  const pageNumbers = getPageNumbers();
 
   return (
+    <div className="flex items-center justify-center gap-2 py-6 flex-wrap">
 
-    <div className="flex items-center justify-between px-10 py-4">
+      {/* Prev */}
+      <button
+        disabled={page === 1}
+        onClick={() => setPage(page - 1)}
+        className="p-2 rounded bg-gray-100 disabled:opacity-50"
+      >
+        <IoIosArrowBack />
+      </button>
 
-      {/* Per Page */}
-      <div className="flex items-center gap-3">
+      {/* First page */}
+      {pageNumbers[0] > 1 && (
+        <>
+          <button
+            onClick={() => setPage(1)}
+            className="px-3 py-1 bg-gray-100 rounded"
+          >
+            1
+          </button>
 
-        <p className="text-sm font-semibold"> Page No. {page}</p>
+          {pageNumbers[0] > 2 && (
+            <span className="px-2 text-gray-500">...</span>
+          )}
+        </>
+      )}
 
-      </div>
+      {/* Letters (Mapped Pages) */}
+      {pageNumbers.map((p, index) => {
+        const letter = name[index % name.length];
 
-      {/* Page Buttons */}
-      <div className="flex items-center gap-2">
-
-        <button
-          disabled={page === 1}
-          onClick={() => setPage(page - 1)}
-        >
-          <IoIosArrowBack />
-        </button>
-
-        {pageNumbers.map((p) => (
-
+        return (
           <button
             key={p}
             onClick={() => setPage(p)}
-            className={`px-3 py-1 rounded ${
+            className={`px-3 py-1 rounded-full font-bold ${
               page === p
-                ? "bg-green-500 text-white"
-                : "bg-gray-100"
+                ? "bg-red-500 text-white"
+                : "bg-gray-100 hover:bg-gray-200"
             }`}
           >
-            {p}
+            {letter}
           </button>
+        );
+      })}
 
-        ))}
+      {/* Last page */}
+      {pageNumbers[pageNumbers.length - 1] < pages && (
+        <>
+          {pageNumbers[pageNumbers.length - 1] < pages - 1 && (
+            <span className="px-2 text-red-500">...</span>
+          )}
 
-        <button
-          disabled={page === pages}
-          onClick={() => setPage(page + 1)}
-        >
-          <IoIosArrowForward />
-        </button>
+          <button
+            onClick={() => setPage(pages)}
+            className="px-3 py-1 text-white bg-red-600 rounded"
+          >
+            {pages}
+          </button>
+        </>
+      )}
 
-      </div>
-
-      <p className="text-sm font-semibold">
-        Page {page} of {pages}
-      </p>
-
+      {/* Next */}
+      <button
+        disabled={page === pages}
+        onClick={() => setPage(page + 1)}
+        className="p-2 rounded bg-gray-100 disabled:opacity-50"
+      >
+        <IoIosArrowForward />
+      </button>
     </div>
-
   );
 };
 
