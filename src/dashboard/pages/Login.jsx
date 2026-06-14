@@ -41,10 +41,14 @@ const Login = () => {
         }
       })
 
-      if (data.success === true) {
-        localStorage.setItem('newstoken', data.token)
-        navigate('/dashboard')
+      if (data.token) {
+        localStorage.setItem("newstoken", data.token);
+        navigate("/dashboard");
       }
+      // if (data.success === true) {
+      //   localStorage.setItem('newstoken', data.token)
+      //   navigate('/dashboard')
+      // }
     } catch (error) {
       setLoder(false)
       tost.error(error.response.data.message)

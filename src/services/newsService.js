@@ -22,9 +22,16 @@ export const updateNewsStatus = async (id, status) => {
 };
 
 
-export const updateNewsType = async (id, status) => {
-  return axiosInstance.put(`/api/news/types-update/${id}`, payload,);
+export const updateNewsType = async (id, payload) => {
+  return axiosInstance.put(
+    `/api/news/types-update/${id}`,
+    payload
+  );
 };
+
+// export const updateNewsType = async (id, status) => {
+//   return axiosInstance.put(`/api/news/types-update/${id}`, payload,);
+// };
   
 // export const updateNewsType = async (id, payload) => {
 //   return axiosInstance.put(`/api/news/types-update/${id}`, payload, {
