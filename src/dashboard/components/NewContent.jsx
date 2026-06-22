@@ -1,4 +1,4 @@
-import React, {
+import  {
   useContext,
   useState,
   useEffect,
@@ -9,8 +9,6 @@ import React, {
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { base_url } from "../../config/config";
 import storeContext from "../../context/storeContext";
 import toast from "react-hot-toast";
 
@@ -51,6 +49,9 @@ const NewContent = () => {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [total, setTotal] = useState("")
+
+  console.log(total, "total")
 
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -101,6 +102,8 @@ const NewContent = () => {
       const { data } = await fetchNews(query, store.token);
       setNews(data.news);
       setPages(data.pages);
+      setTotal(data.total)
+
 
     } catch (error) {
 
@@ -140,14 +143,14 @@ const NewContent = () => {
   }, [getWriters]);
 
   // Format Date
-  const formatDate = (date) => {
-    return new Intl.DateTimeFormat("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      timeZone: "Asia/Kolkata"
-    }).format(new Date(date));
-  };
+  // const formatDate = (date) => {
+  //   return new Intl.DateTimeFormat("en-IN", {
+  //     day: "2-digit",
+  //     month: "short",
+  //     year: "numeric",
+  //     timeZone: "Asia/Kolkata"
+  //   }).format(new Date(date));
+  // };
 
   // Format Time
   const formatTime = (date) => {
@@ -428,6 +431,7 @@ const NewContent = () => {
           pages={pages}
           setPerPage={setPerPage}
           setPage={setPage}
+          totalItem={total}
         />
       </div>
 
