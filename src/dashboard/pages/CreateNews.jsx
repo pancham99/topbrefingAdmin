@@ -23,6 +23,8 @@ const CreateNews = () => {
   const [state, setState] = useState('')
   const [img, setImg] = useState('')
   const [description, setDescription] = useState('')
+  const [shortDescription, setShortDescription] = useState('')
+  const [keywords, setKeywords] = useState('')
 
   const imageHandle = (e) => {
     const { files } = e.target
@@ -50,6 +52,8 @@ const CreateNews = () => {
     formData.append('image', image)
     formData.append('state', state)
     formData.append('description', description)
+    formData.append('shortDescription', shortDescription)
+    formData.append('keywords', keywords)
 
     try {
       setLoader(true)
@@ -134,6 +138,16 @@ const CreateNews = () => {
             <div className='flex flex-col gap-y-2 mb-5'>
               <label className='text-md font-medium text-gray-600' htmlFor='title'>Title</label>
               <input required value={title} onChange={(e) => setTitle(e.target.value)} type='text' placeholder='news title' name='title' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id='title' />
+            </div>
+
+             <div className='flex flex-col gap-y-2 mb-5'>
+              <label className='text-md font-medium text-gray-600' htmlFor='shortDescription'>Short Description</label>
+              <input required value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} type='text' placeholder='short description' name='shortDescription' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id='shortDescription' />
+            </div>
+
+             <div className='flex flex-col gap-y-2 mb-5'>
+              <label className='text-md font-medium text-gray-600' htmlFor='keywords'>Keywords</label>
+              <input required value={keywords} onChange={(e) => setKeywords(e.target.value)} type='text' placeholder='keywords' name='keywords' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id='keywords' />
             </div>
 
             <div className='mb-6'>
