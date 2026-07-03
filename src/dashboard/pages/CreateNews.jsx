@@ -25,26 +25,20 @@ const CreateNews = () => {
   const [description, setDescription] = useState('')
   const [shortDescription, setShortDescription] = useState('')
   const [keywords, setKeywords] = useState('')
-
   const imageHandle = (e) => {
     const { files } = e.target
     if (files.length > 0) {
       setImg(URL.createObjectURL(files[0]))
       setImage(files[0])
     }
-
   }
-
 
   const handleStateChange = (e) => {
     const selectedState = e.target.value;
     setState(selectedState);
-
-
   };
 
   const [loader, setLoader] = useState(false)
-
   const added = async (e) => {
     e.preventDefault()
     const formData = new FormData()

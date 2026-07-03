@@ -10,7 +10,7 @@ if (mode === production) {
      base_url = 'https://bakendtopbrefing.vercel.app'
     
 } else {
-   base_url = 'https://bakendtopbrefing.vercel.app'
+   base_url = 'http://localhost:5001'
 }
 
 export { base_url };
