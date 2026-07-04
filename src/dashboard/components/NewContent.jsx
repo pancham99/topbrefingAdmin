@@ -1,38 +1,80 @@
-import  {
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo
-} from "react";
+import {
+  useContext, useState, useEffect, useCallback, useMemo,
+} from 'react';
+import { FaEdit } from 'react-icons/fa';
+import { MdDelete } from 'react-icons/md';
+import { HiOutlineSearch } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
+import storeContext from '../../context/storeContext';
+import toast from 'react-hot-toast';
+import moment from 'moment-timezone';
 
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { Link } from "react-router-dom";
-import storeContext from "../../context/storeContext";
-import toast from "react-hot-toast";
-
-import FillterStatus from "./fillter/FillterStatus";
-import FillterCategory from "./fillter/FillterCategory";
-import FillterWriters from "./fillter/FillterWriters";
-import Pagination from "./Pagination";
-
-import moment from "moment-timezone";
-import FilterDate from "./fillter/FilterDate";
-import FilterType from "./fillter/FilterType";
-
+import FillterStatus from './fillter/FillterStatus';
+import FillterCategory from './fillter/FillterCategory';
+import FillterWriters from './fillter/FillterWriters';
+import FilterDate from './fillter/FilterDate';
+import FilterType from './fillter/FilterType';
+import Pagination from './Pagination';
 
 import {
-  fetchNews,
-  fetchWriters,
-  deleteNews,
-  updateNewsStatus,
-  updateNewsType
-} from "../../services/newsService";
+  fetchNews, fetchWriters, deleteNews,
+  updateNewsStatus, updateNewsType,
+} from '../../services/newsService';
 
+/* ─── status badge ───────────────────────────────────────────── */
+const StatusBadge = ({ status, onClick, isAdmin }) => {
+  const map = {
+    active: 'bg-green-100 text-green-700 border-green-200',
+    pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+    deactive: 'bg-red-100 text-red-600 border-red-200',
+  };
+  return (
+    <span
+      onClick={isAdmin ? onClick : undefined}
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border
+        ${map[status] ?? 'bg-gray-100 text-gray-600 border-gray-200'}
+        ${isAdmin ? 'cursor-pointer hover:opacity-80 transition' : ''}`}
+    >
+      {status}
+    </span>
+  );
+};
+
+/* ─── type badge ─────────────────────────────────────────────── */
+const TypeBadge = ({ type }) => {
+  const map = {
+    breaking: 'bg-red-50 text-red-600',
+    trending: 'bg-orange-50 text-orange-600',
+    featured: 'bg-blue-50 text-blue-600',
+    popular: 'bg-purple-50 text-purple-600',
+    none: 'bg-gray-100 text-gray-400',
+  };
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${map[type] ?? map.none}`}>
+      {type}
+    </span>
+  );
+};
+
+/* ─── table row skeleton ─────────────────────────────────────── */
+const RowSkeleton = () => (
+  <>
+    {Array.from({ length: 8 }).map((_, i) => (
+      <tr key={i} className="border-b border-gray-50 animate-pulse">
+        {Array.from({ length: 9 }).map((__, j) => (
+          <td key={j} className="px-4 py-3">
+            <div className="h-3 bg-gray-200 rounded w-full" />
+          </td>
+        ))}
+      </tr>
+    ))}
+  </>
+);
+
+/* ══════════════════════════════════════════════════════════════ */
 const NewContent = () => {
-
   const { store } = useContext(storeContext);
+
   const [news, setNews] = useState([]);
   const [writers, setWriters] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -40,391 +82,252 @@ const NewContent = () => {
   const [page, setPage] = useState(1);
   const [parPage, setPerPage] = useState(20);
   const [pages, setPages] = useState(0);
+  const [total, setTotal] = useState('');
 
-  const [status, setStatus] = useState("");
-  const [category, setCategory] = useState("");
-  const [writer, setWriter] = useState("");
-  const [search, setSearch] = useState("");
-  const [type, setType] = useState("");
+  const [status, setStatus] = useState('');
+  const [category, setCategory] = useState('');
+  const [writer, setWriter] = useState('');
+  const [search, setSearch] = useState('');
+  const [type, setType] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [total, setTotal] = useState("")
-
-  console.log(total, "total")
-
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-
-  // Debounce Search
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setDebouncedSearch(search), 500);
+    return () => clearTimeout(t);
   }, [search]);
 
-  // Query Builder
-  const query = useMemo(() => {
+  const query = useMemo(() => new URLSearchParams({
+    page, limit: parPage, status, category,
+    writerName: writer, search: debouncedSearch,
+    startDate, endDate, type,
+  }).toString(), [page, parPage, status, category, writer, debouncedSearch, startDate, endDate, type]);
 
-    return new URLSearchParams({
-      page,
-      limit: parPage,
-      status,
-      category,
-      writerName: writer,
-      search: debouncedSearch,
-      startDate,
-      endDate,
-      type
-    }).toString();
-
-  }, [
-    page,
-    parPage,
-    status,
-    category,
-    writer,
-    debouncedSearch,
-    startDate,
-    endDate,
-    type
-  ]);
-
-  // Fetch News
   const getNews = useCallback(async () => {
-
     try {
-
       setLoading(true);
-
       const { data } = await fetchNews(query, store.token);
       setNews(data.news);
       setPages(data.pages);
-      setTotal(data.total)
-
-
-    } catch (error) {
-
-      console.log(error);
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
+      setTotal(data.total);
+    } catch (e) { console.log(e); }
+    finally { setLoading(false); }
   }, [query, store.token]);
 
-  // Fetch Writers
   const getWriters = useCallback(async () => {
-
     try {
-
       const { data } = await fetchWriters(store.token);
-
       setWriters(data.writers);
-
-    } catch (error) {
-
-      console.log(error);
-
-    }
-
+    } catch (e) { console.log(e); }
   }, [store.token]);
 
-  useEffect(() => {
-    getNews();
-  }, [getNews]);
+  useEffect(() => { getNews(); }, [getNews]);
+  useEffect(() => { getWriters(); }, [getWriters]);
 
-  useEffect(() => {
-    getWriters();
-  }, [getWriters]);
-
-  // Format Date
-  // const formatDate = (date) => {
-  //   return new Intl.DateTimeFormat("en-IN", {
-  //     day: "2-digit",
-  //     month: "short",
-  //     year: "numeric",
-  //     timeZone: "Asia/Kolkata"
-  //   }).format(new Date(date));
-  // };
-
-  // Format Time
-  const formatTime = (date) => {
-    return new Intl.DateTimeFormat("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true
-    }).format(new Date(date));
-  };
+  const formatTime = (date) =>
+    new Intl.DateTimeFormat('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
+      .format(new Date(date));
 
   const getCurrentType = (n) => {
-    if (n.isBreaking) return "breaking";
-    if (n.isTrending) return "trending";
-    if (n.isFeatured) return "featured";
-    if (n.isPopular) return "popular";
-    return "none";
+    if (n.isBreaking) return 'breaking';
+    if (n.isTrending) return 'trending';
+    if (n.isFeatured) return 'featured';
+    if (n.isPopular) return 'popular';
+    return 'none';
   };
 
-  // Delete News
   const handleDelete = async (id) => {
-
     try {
-
       await deleteNews(id, store.token);
-
-      toast.success("News deleted");
-
+      toast.success('News deleted');
       setNews((prev) => prev.filter((n) => n._id !== id));
-
-    } catch (error) {
-
-      toast.error("Delete failed");
-
-    }
-
+    } catch { toast.error('Delete failed'); }
   };
 
-  // Update Status
   const handleStatus = async (status, id) => {
-
     try {
-
       const { data } = await updateNewsStatus(id, status, store.token);
-
       toast.success(data.message);
-
-      setNews((prev) =>
-        prev.map((n) =>
-          n._id === id ? { ...n, status } : n
-        )
-      );
-
-    } catch (error) {
-
-      toast.error("Status update failed");
-
-    }
-
+      setNews((prev) => prev.map((n) => n._id === id ? { ...n, status } : n));
+    } catch { toast.error('Status update failed'); }
   };
 
-  // Update Type
   const handleType = async (type, id) => {
-
-    const payload = {
-      isBreaking: false,
-      isTrending: false,
-      isFeatured: false,
-      isPopular: false
-    };
-
-    if (type === "breaking") payload.isBreaking = true;
-    if (type === "trending") payload.isTrending = true;
-    if (type === "featured") payload.isFeatured = true;
-    if (type === "popular") payload.isPopular = true;
-
+    const payload = { isBreaking: false, isTrending: false, isFeatured: false, isPopular: false };
+    if (type === 'breaking') payload.isBreaking = true;
+    if (type === 'trending') payload.isTrending = true;
+    if (type === 'featured') payload.isFeatured = true;
+    if (type === 'popular') payload.isPopular = true;
     try {
-
       const { data } = await updateNewsType(id, payload, store.token);
-
       toast.success(data.message);
-
-      setNews((prev) =>
-        prev.map((n) =>
-          n._id === id ? { ...n, ...payload } : n
-        )
-      );
-
-    } catch (error) {
-
-      toast.error("Type update failed");
-
-    }
-
+      setNews((prev) => prev.map((n) => n._id === id ? { ...n, ...payload } : n));
+    } catch { toast.error('Type update failed'); }
   };
 
-
-
+  const isAdmin = store?.userInfo?.role === 'admin';
 
   return (
+    <div className="space-y-0">
 
-    <div>
-      <div className="w-full px-4">
-        <span className='text-gray-800 font-semibold text-sm'>Search</span>
-        <input
-          type="text"
-          placeholder="Search news"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="lg:px-3 w-full py-2 rounded-md border border-gray-300 focus:border-green-500 outline-0"
-        />
+      {/* ── search + filters bar ── */}
+      <div className="px-4 pt-4 pb-2 space-y-3">
+        {/* search */}
+        <div className="relative">
+          <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <input
+            type="text"
+            placeholder="Search articles…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-400 bg-gray-50 placeholder-gray-400 transition"
+          />
+        </div>
+
+        {/* filter row */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 py-4 overflow-x-auto">
+          <FillterStatus setStatus={setStatus} />
+          <FillterCategory setCategory={setCategory} />
+          <FilterType setType={setType} />
+          <FillterWriters writers={writers} setWriter={setWriter} />
+          <FilterDate value={startDate} onChange={setStartDate} placeholder="Start Date" />
+          <FilterDate value={endDate} onChange={setEndDate} placeholder="End Date" />
+        </div>
       </div>
 
-      {/* Filters */}
-      <div className="px-4 py-3 lg:flex gap-x-3 space-y-3 lg:space-y-0">
+      {/* ── table ── */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left">
 
-        <FillterStatus setStatus={setStatus} />
+          <thead>
+            <tr className="bg-gray-50 border-y border-gray-100">
+              {['#', 'Article', 'Image', 'Category', 'Date', 'Status', 'Type', 'Actions']
+                .map((h) => (
+                  <th key={h} className="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+            </tr>
+          </thead>
 
-        <FillterCategory setCategory={setCategory} />
-
-        <FilterType setType={setType} />
-
-        <FillterWriters writers={writers} setWriter={setWriter} />
-
-        <FilterDate
-
-          value={startDate}
-          onChange={setStartDate}
-          placeholder="Start Date"
-        />
-
-        <FilterDate
-          value={endDate}
-          onChange={setEndDate}
-          placeholder="End Date"
-        />
-
-
-
-
-      </div>
-
-      {/* Table */}
-      <div className="relative overflow-x-auto p-4">
-
-        {loading ? (
-          <p className="text-center py-10">Loading...</p>
-        ) : (
-
-          <table className="w-full text-sm text-left text-slate-600">
-
-            <thead className="text-xs uppercase bg-gray-50">
+          <tbody className="divide-y divide-gray-50">
+            {loading ? (
+              <RowSkeleton />
+            ) : news.length === 0 ? (
               <tr>
-                <th className="px-7 py-3">No</th>
-                {/* <th className="px-7 py-3">Writer</th> */}
-                <th className="px-7 py-3">Title</th>
-                <th className="px-7 py-3">Image</th>
-                <th className="px-7 py-3">Category</th>
-                <th className="px-7 py-3">Date</th>
-                <th className="px-7 py-3">Time</th>
-                <th className="px-7 py-3">Status</th>
-                <th className="px-7 py-3">Type</th>
-                <th className="px-7 py-3">Action</th>
+                <td colSpan={8} className="px-4 py-16 text-center text-gray-400 text-sm">
+                  No News found.
+                </td>
               </tr>
-            </thead>
+            ) : (
+              news.map((n, i) => (
+                <tr key={n._id} className="hover:bg-gray-50/60 transition-colors">
 
-            <tbody>
-
-              {news.map((n, i) => (
-
-                <tr key={n._id} className="border-b text-xs">
-
-                  <td className="px-6 py-4">
+                  {/* # */}
+                  <td className="px-4 py-3 text-xs text-gray-400 font-mono">
                     {(page - 1) * parPage + i + 1}
                   </td>
 
-                  <td className="px-6 py-4">
-                    {n.title?.slice(0, 20)}...
+                  {/* title */}
+                  <td className="px-4 py-3 max-w-[200px]">
+                    <p className="text-sm font-medium text-gray-800 truncate" title={n.title}>
+                      {n.title?.slice(0, 40)}{n.title?.length > 40 ? '…' : ''}
+                    </p>
+                    {n.writerName && (
+                      <p className="text-xs text-gray-400 mt-0.5">by {n.writerName}</p>
+                    )}
                   </td>
 
-                  {/* <td className="px-6 py-4">
-                    {n.writerName}
-                  </td> */}
-
-                  <td className="px-6 py-4">
+                  {/* image */}
+                  <td className="px-4 py-3">
                     <img
                       src={n.image}
                       loading="lazy"
-                      className="w-[40px] h-[40px] object-cover"
+                      alt=""
+                      className="w-10 h-10 object-cover rounded-lg border border-gray-100"
                     />
                   </td>
 
-                  <td className="px-6 py-4">{n.category}</td>
-
-                  <td className="px-6 py-4">
-                    {moment
-                      .utc(n?.createdAt)
-                      .tz("Asia/Kolkata")
-                      .format("DD MMM YYYY")}
+                  {/* category */}
+                  <td className="px-4 py-3">
+                    <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-md font-medium whitespace-nowrap">
+                      {n.category || '—'}
+                    </span>
                   </td>
 
-                  <td className="px-6 py-4">
-                    {formatTime(n.createdAt)}
+                  {/* date */}
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <p className="text-xs text-gray-700">
+                      {moment.utc(n?.createdAt).tz('Asia/Kolkata').format('DD MMM YYYY')}
+                    </p>
+                    <p className="text-[10px] text-gray-400">{formatTime(n.createdAt)}</p>
                   </td>
 
-                  <td className="px-6 py-4">
-
-                    {store?.userInfo?.role === "admin" ? (
-
-                      <span
-                        onClick={() =>
-                          handleStatus(
-                            n.status === "active" ? "deactive" : "active",
-                            n._id
-                          )
-                        }
-                        className="px-2 py-[2px] bg-green-100 rounded cursor-pointer"
-                      >
-                        {n.status}
-                      </span>
-
-                    ) : (
-                      <span>{n.status}</span>
-                    )}
-
+                  {/* status */}
+                  <td className="px-4 py-3">
+                    <StatusBadge
+                      status={n.status}
+                      isAdmin={isAdmin}
+                      onClick={() =>
+                        handleStatus(n.status === 'active' ? 'deactive' : 'active', n._id)
+                      }
+                    />
                   </td>
 
-                  <td className="px-6 py-4">
-
+                  {/* type */}
+                  <td className="px-4 py-3">
                     <select
-                      className="border border-gray-300 bg-white rounded-md px-3 py-1 text-xs
-                      focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+                      className="border border-gray-200 bg-white rounded-lg px-2 py-1 text-xs
+                                 focus:outline-none focus:ring-2 focus:ring-purple-200 cursor-pointer
+                                 text-gray-700"
                       value={getCurrentType(n)}
                       onChange={(e) => handleType(e.target.value, n._id)}
                     >
-
                       <option value="none">None</option>
                       <option value="breaking">Breaking</option>
                       <option value="trending">Trending</option>
                       <option value="featured">Featured</option>
                       <option value="popular">Popular</option>
-
                     </select>
-
                   </td>
 
-                  <td className="px-6 py-4 flex gap-2">
-
-                    {store?.userInfo?.role === "admin" && (
-                      <button onClick={() => handleDelete(n._id)}>
-                        <MdDelete className="text-red-600" size={24} />
-                      </button>
-                    )}
-
-                    {store?.userInfo?.role === "writer" && (
-                      <Link to={`/dashboard/news/edit/${n._id}`}>
-                        <FaEdit />
-                      </Link>
-                    )}
-
+                  {/* actions */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDelete(n._id)}
+                          className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition"
+                          title="Delete"
+                        >
+                          <MdDelete size={17} />
+                        </button>
+                      )}
+                      {!isAdmin && (
+                        <Link
+                          to={`/dashboard/news/edit/${n._id}`}
+                          className="p-1.5 rounded-lg text-blue-400 hover:text-blue-600 hover:bg-blue-50 transition"
+                          title="Edit"
+                        >
+                          <FaEdit size={14} />
+                        </Link>
+                      )}
+                    </div>
                   </td>
 
                 </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        )}
-
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      <div className="flex items-center justify-end px-4 py-2 mx-auto max-w-2xl">
+      {/* ── pagination ── */}
+      <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+        <p className="text-xs text-gray-400">
+          {total ? `${total} articles total` : ''}
+        </p>
         <Pagination
           parPage={parPage}
           page={page}
@@ -436,434 +339,7 @@ const NewContent = () => {
       </div>
 
     </div>
-
   );
 };
 
 export default NewContent;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React, { useContext, useState, useEffect } from "react";
-// import { FaEdit } from "react-icons/fa";
-// import { MdDelete } from "react-icons/md";
-// import { Link } from "react-router-dom";
-// import axios from "axios";
-// import { base_url } from "../../config/config";
-// import storeContext from "../../context/storeContext";
-// import toast from "react-hot-toast";
-
-// import FillterStatus from "./fillter/FillterStatus";
-// import FillterCategory from "./fillter/FillterCategory";
-// import FillterWriters from "./fillter/FillterWriters";
-// import Pagination from "./Pagination";
-
-// import moment from "moment-timezone";
-// import FilterDate from "./fillter/FilterDate";
-// import FilterType from "./fillter/FilterType";
-
-// const NewContent = () => {
-
-//   const { store } = useContext(storeContext);
-
-//   const [news, setNews] = useState([]);
-//   const [writers, setWriters] = useState([]);
-//   const [parPage, setPerPage] = useState(20);
-//   const [pages, setPages] = useState(0);
-//   const [page, setPage] = useState(1);
-//   const [loading, setLoading] = useState(false);
-
-//   // 🔥 Filters State
-//   const [status, setStatus] = useState("");
-//   const [category, setCategory] = useState("");
-//   const [writer, setWriter] = useState("");
-//   const [search, setSearch] = useState("");
-//   const [startDate, setStartDate] = useState("");
-//   const [endDate, setEndDate] = useState("");
-//   const [type, setType] = useState("");
-
-
-//   const getCurrentType = (n) => {
-//     if (n.isBreaking) return "breaking";
-//     if (n.isTrending) return "trending";
-//     if (n.isFeatured) return "featured";
-//     if (n.isPopular) return "popular";
-//     return "none";
-//   };
-
-
-
-
-//   const get_news = async () => {
-
-//     try {
-
-//       setLoading(true);
-
-//       const query = new URLSearchParams({
-//         page,
-//         limit: parPage,
-//         status,
-//         category,
-//         writerName: writer,
-//         search,
-//         startDate,
-//         endDate,
-//         type
-//       });
-
-//       const { data } = await axios.get(
-//         `${base_url}/api/news?${query.toString()}`,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${store.token}`
-//           }
-//         }
-//       );
-
-//       setNews(data.news);
-//       setPages(data.pages);
-
-//       setLoading(false);
-
-//     } catch (error) {
-//       setLoading(false);
-//       console.log(error.message);
-//     }
-//   };
-
-//   // 🔥 Fetch Writers
-//   const get_writers = async () => {
-
-//     try {
-
-//       const { data } = await axios.get(`${base_url}/api/news/writers`, {
-//         headers: {
-//           Authorization: `Bearer ${store.token}`
-//         }
-//       });
-
-//       setWriters(data.writers);
-
-//     } catch (error) {
-//       console.log(error);
-//     }
-
-//   };
-
-//   useEffect(() => {
-//     get_news();
-//   }, [page, parPage, status, category, writer, startDate, endDate, search, type]);
-
-//   useEffect(() => {
-//     get_writers();
-//   }, []);
-
-//   // Format Time
-//   const formatTime = (date) => {
-//     return new Date(date).toLocaleTimeString("en-IN", {
-//       hour: "2-digit",
-//       minute: "2-digit"
-//     });
-//   };
-
-//   // Delete News
-//   const delete_news = async (id) => {
-
-//     try {
-
-//       await axios.delete(`${base_url}/api/news/delete/${id}`, {
-//         headers: {
-//           Authorization: `Bearer ${store.token}`
-//         }
-//       });
-
-//       toast.success("News deleted");
-
-//       setNews(prev => prev.filter(n => n._id !== id));
-
-//     } catch (error) {
-//       console.log(error);
-//     }
-
-//   };
-
-//   // Update Status
-//   const update_status = async (status, id) => {
-
-//     try {
-
-//       const { data } = await axios.put(
-//         `${base_url}/api/news/status-update/${id}`,
-//         { status },
-//         {
-//           headers: {
-//             Authorization: `Bearer ${store.token}`
-//           }
-//         }
-//       );
-
-//       toast.success(data.message);
-
-//       setNews(prev =>
-//         prev.map(n =>
-//           n._id === id ? { ...n, status } : n
-//         )
-//       );
-
-//     } catch (error) {
-//       toast.error(error.response?.data?.message);
-//     }
-
-//   };
-
-//   // Update Types
-//   const update_types = async (type, id) => {
-
-//     try {
-
-//       const payload = {
-//         isBreaking: false,
-//         isTrending: false,
-//         isFeatured: false,
-//         isPopular: false
-//       };
-
-//       if (type === "breaking") payload.isBreaking = true;
-//       if (type === "trending") payload.isTrending = true;
-//       if (type === "featured") payload.isFeatured = true;
-//       if (type === "popular") payload.isPopular = true;
-
-//       const { data } = await axios.put(
-//         `${base_url}/api/news/types-update/${id}`,
-//         payload,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${store.token}`
-//           }
-//         }
-//       );
-
-//       toast.success(data.message);
-
-//       setNews(prev =>
-//         prev.map(n =>
-//           n._id === id ? { ...n, ...payload } : n
-//         )
-//       );
-
-//     } catch (error) {
-//       toast.error(error.response?.data?.message);
-//     }
-
-//   };
-
-//   return (
-
-//     <div>
-//       <div className="w-full px-4">
-//         <span className='text-gray-800 font-semibold text-sm'>Search</span>
-//         <input
-//           type="text"
-//           placeholder="Search news"
-//           value={search}
-//           onChange={(e) => setSearch(e.target.value)}
-//           className="lg:px-3 w-full py-2 rounded-md border border-gray-300 focus:border-green-500 outline-0"
-//         />
-//       </div>
-
-//       {/* Filters */}
-//       <div className="px-4 py-3 lg:flex gap-x-3 space-y-3 lg:space-y-0">
-
-//         <FillterStatus setStatus={setStatus} />
-
-//         <FillterCategory setCategory={setCategory} />
-
-//         <FilterType setType={setType} />
-
-//         <FillterWriters writers={writers} setWriter={setWriter} />
-
-//         <FilterDate
-
-//           value={startDate}
-//           onChange={setStartDate}
-//           placeholder="Start Date"
-//         />
-
-//         <FilterDate
-//           value={endDate}
-//           onChange={setEndDate}
-//           placeholder="End Date"
-//         />
-
-
-
-
-//       </div>
-
-//       {/* Table */}
-//       <div className="relative overflow-x-auto p-4">
-
-//         {loading ? (
-//           <p className="text-center py-10">Loading...</p>
-//         ) : (
-
-//           <table className="w-full text-sm text-left text-slate-600">
-
-//             <thead className="text-xs uppercase bg-gray-50">
-//               <tr>
-//                 <th className="px-7 py-3">No</th>
-//                 {/* <th className="px-7 py-3">Writer</th> */}
-//                 <th className="px-7 py-3">Title</th>
-//                 <th className="px-7 py-3">Image</th>
-//                 <th className="px-7 py-3">Category</th>
-//                 <th className="px-7 py-3">Date</th>
-//                 <th className="px-7 py-3">Time</th>
-//                 <th className="px-7 py-3">Status</th>
-//                 <th className="px-7 py-3">Type</th>
-//                 <th className="px-7 py-3">Action</th>
-//               </tr>
-//             </thead>
-
-//             <tbody>
-
-//               {news.map((n, i) => (
-
-//                 <tr key={n._id} className="border-b text-xs">
-
-//                   <td className="px-6 py-4">
-//                     {(page - 1) * parPage + i + 1}
-//                   </td>
-
-//                   <td className="px-6 py-4">
-//                     {n.title?.slice(0, 20)}...
-//                   </td>
-
-//                   {/* <td className="px-6 py-4">
-//                     {n.writerName}
-//                   </td> */}
-
-//                   <td className="px-6 py-4">
-//                     <img
-//                       src={n.image}
-//                       loading="lazy"
-//                       className="w-[40px] h-[40px] object-cover"
-//                     />
-//                   </td>
-
-//                   <td className="px-6 py-4">{n.category}</td>
-
-//                   <td className="px-6 py-4">
-//                     {moment
-//                       .utc(n?.createdAt)
-//                       .tz("Asia/Kolkata")
-//                       .format("DD MMM YYYY")}
-//                   </td>
-
-//                   <td className="px-6 py-4">
-//                     {formatTime(n.createdAt)}
-//                   </td>
-
-//                   <td className="px-6 py-4">
-
-//                     {store?.userInfo?.role === "admin" ? (
-
-//                       <span
-//                         onClick={() =>
-//                           update_status(
-//                             n.status === "active" ? "deactive" : "active",
-//                             n._id
-//                           )
-//                         }
-//                         className="px-2 py-[2px] bg-green-100 rounded cursor-pointer"
-//                       >
-//                         {n.status}
-//                       </span>
-
-//                     ) : (
-//                       <span>{n.status}</span>
-//                     )}
-
-//                   </td>
-
-//                   <td className="px-6 py-4">
-
-//                     <select
-//                       className="border border-gray-300 bg-white rounded-md px-3 py-1 text-xs
-//                       focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
-//                       value={getCurrentType(n)}
-//                       onChange={(e) => update_types(e.target.value, n._id)}
-//                     >
-
-//                       <option value="none">None</option>
-//                       <option value="breaking">Breaking</option>
-//                       <option value="trending">Trending</option>
-//                       <option value="featured">Featured</option>
-//                       <option value="popular">Popular</option>
-
-//                     </select>
-
-//                   </td>
-
-//                   <td className="px-6 py-4 flex gap-2">
-
-//                     {store?.userInfo?.role === "admin" && (
-//                       <button onClick={() => delete_news(n._id)}>
-//                         <MdDelete className="text-red-600" size={24} />
-//                       </button>
-//                     )}
-
-//                     {store?.userInfo?.role === "writer" && (
-//                       <Link to={`/dashboard/news/edit/${n._id}`}>
-//                         <FaEdit />
-//                       </Link>
-//                     )}
-
-//                   </td>
-
-//                 </tr>
-
-//               ))}
-
-//             </tbody>
-
-//           </table>
-
-//         )}
-
-//       </div>
-
-//       <Pagination
-//         parPage={parPage}
-//         page={page}
-//         pages={pages}
-//         setPerPage={setPerPage}
-//         setPage={setPage}
-//       />
-
-//     </div>
-
-//   );
-// };
-
-// export default NewContent;
