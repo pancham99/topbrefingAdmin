@@ -2,7 +2,7 @@ import {
   useContext, useState, useEffect, useCallback, useMemo,
 } from 'react';
 import { FaEdit } from 'react-icons/fa';
-import { MdDelete } from 'react-icons/md';
+import { MdDelete, MdVisibility } from 'react-icons/md';
 import { HiOutlineSearch } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 import storeContext from '../../context/storeContext';
@@ -295,6 +295,15 @@ const NewContent = () => {
                   {/* actions */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
+                      {/* View details — available to everyone */}
+                      <Link
+                        to={`/dashboard/news/details/${n._id}`}
+                        className="p-1.5 rounded-lg text-purple-400 hover:text-purple-600 hover:bg-purple-50 transition"
+                        title="View Details"
+                      >
+                        <MdVisibility size={17} />
+                      </Link>
+
                       {isAdmin && (
                         <button
                           onClick={() => handleDelete(n._id)}
