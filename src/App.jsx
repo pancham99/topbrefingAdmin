@@ -28,6 +28,7 @@ import Subscribers from './dashboard/pages/Subscribe';
 import VideoContents from './dashboard/components/VideoContents';
 import AddyoutubeVideo from './dashboard/pages/AddyoutubeVideo';
 import AllyoutubeVideo from './dashboard/pages/AllyoutubeVideo';
+import NewsDetails from './dashboard/pages/NewsDetails';
 
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
 
             <Route path="unable-access" element={<Unable />} />
             <Route path="news" element={<News />} />
+            <Route path="news/details/:news_id" element={<NewsDetails />} />
             <Route path="profile" element={<Profile />} />
 
             {/* ✅ Admin Routes */}

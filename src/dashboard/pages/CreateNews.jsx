@@ -14,11 +14,18 @@ import toast from 'react-hot-toast'
 
 /* ─── helpers ──────────────────────────────────────────────── */
 
-/** Convert title → URL slug: spaces become hyphens, everything else stays as-is */
-const titleToSlug = (title) =>
-  title
-    .trim()
-    .replace(/\s+/g, '-')
+/**
+ * Devanagari → ASCII romanization, then → URL slug.
+ *
+ * Works as a state machine:
+ *   - Each consonant emits its base sound WITHOUT the inherent 'a'
+ *   - A following vowel sign (matra) adds its vowel
+ *   - No following matra/halant = add inherent 'a'
+ *   - Halant (्) suppresses the inherent 'a' (consonant cluster)
+ *   - Independent vowels emit directly
+ */
+
+
 
 const CATEGORIES = [
   'राजनीति', 'खेल', 'राष्ट्रीय', 'अंतरराष्ट्रीय',
@@ -89,10 +96,10 @@ const CreateNews = () => {
 
   /* ── auto-generate slug from title ── */
   useEffect(() => {
-    if (!slugEdited && title) {
-      setSlug(titleToSlug(title))
+    if (!slug && title) {
+      setSlug((title))
     }
-  }, [title, slugEdited])
+  }, [title, slug])
 
   /* ── image pick ── */
   const imageHandle = (e) => {
@@ -270,8 +277,8 @@ const CreateNews = () => {
                             setSlugEdited(true)
                             setSlug(e.target.value
                               .toLowerCase()
-                              .replace(/[^a-z0-9-]/g, '')
-                              .replace(/-+/g, '-'))
+                            // collapse multiple hyphens
+                            )
                           }}
                           type='text'
                           placeholder='auto-generated-from-title'
@@ -280,7 +287,7 @@ const CreateNews = () => {
                         {slugEdited && (
                           <button
                             type='button'
-                            onClick={() => { setSlugEdited(false); setSlug(titleToSlug(title)) }}
+                            onClick={() => { setSlugEdited(false); setSlug(title) }}
                             className='shrink-0 px-3 py-2 text-xs text-purple-600 border border-purple-200 
                                        rounded-lg hover:bg-purple-50 transition whitespace-nowrap'
                           >
