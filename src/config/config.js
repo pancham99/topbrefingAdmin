@@ -7,10 +7,10 @@ const mode = development;
 let base_url = '';
 
 if (mode === production) {
-     base_url = 'https://bakendtopbrefing.vercel.app';
+     base_url = 'http://localhost:5001';
     
 } else {
-   base_url = 'https://bakendtopbrefing.vercel.app';
+   base_url = 'http://localhost:5001';
 }
 
 export { base_url };

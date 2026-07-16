@@ -1,7 +1,7 @@
 import { useRef, useContext, useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  MdCloudUpload, MdClose, MdAutoAwesome,
+  MdCloudUpload, MdAutoAwesome,
   MdArticle, MdImage, MdTune, MdOutlineLabel
 } from 'react-icons/md'
 import { FiExternalLink } from 'react-icons/fi'
@@ -11,56 +11,10 @@ import { base_url } from '../../config/config'
 import axios from 'axios'
 import storeContext from '../../context/storeContext'
 import toast from 'react-hot-toast'
-
-/* ─── helpers ──────────────────────────────────────────────── */
-
-/**
- * Devanagari → ASCII romanization, then → URL slug.
- *
- * Works as a state machine:
- *   - Each consonant emits its base sound WITHOUT the inherent 'a'
- *   - A following vowel sign (matra) adds its vowel
- *   - No following matra/halant = add inherent 'a'
- *   - Halant (्) suppresses the inherent 'a' (consonant cluster)
- *   - Independent vowels emit directly
- */
-
-
-
-const CATEGORIES = [
-  'राजनीति', 'खेल', 'राष्ट्रीय', 'अंतरराष्ट्रीय',
-  'प्रौद्योगिकी', 'मनोरंजन', 'लाइफस्टाइल', 'भक्ति',
-  'शिक्षा', 'स्वास्थ्य', 'मौसम', 'अपराध', 'राशि', 'बाज़ार',
-]
-
-const STATES = [
-  'बिहार', 'उत्तर प्रदेश', 'दिल्ली', 'मध्य प्रदेश',
-  'राजस्थान', 'महाराष्ट्र', 'गुजरात', 'कर्नाटक',
-  'तमिलनाडु', 'पश्चिम बंगाल', 'पंजाब', 'हरियाणा',
-  'झारखंड', 'छत्तीसगढ़', 'ओडिशा', 'असम', 'हिमाचल प्रदेश',
-]
-
-/* ─── section heading ───────────────────────────────────────── */
-const SectionHead = ({ icon: Icon, label }) => (
-  <div className='flex items-center gap-2 mb-4 pb-2 border-b border-gray-100'>
-    <span className='p-1.5 bg-purple-50 rounded-md text-purple-600'><Icon size={16} /></span>
-    <h3 className='text-sm font-semibold text-gray-700 uppercase tracking-wide'>{label}</h3>
-  </div>
-)
-
-/* ─── field wrapper ─────────────────────────────────────────── */
-const Field = ({ label, hint, required, children }) => (
-  <div className='flex flex-col gap-1.5 mb-5'>
-    <div className='flex items-center justify-between'>
-      <label className='text-sm font-medium text-gray-700'>
-        {label} {required && <span className='text-red-500'>*</span>}
-      </label>
-      {hint && <span className='text-xs text-gray-400'>{hint}</span>}
-    </div>
-    {children}
-  </div>
-)
-
+import SectionHead from '../components/news/SectionHead'
+import Field from '../components/news/Field'
+import Row from '../components/news/Row'
+import { CATEGORIES, STATES } from '../../constant/Data'
 const inputCls =
   'w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm outline-none ' +
   'focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition bg-white placeholder-gray-400'
@@ -497,7 +451,7 @@ const CreateNews = () => {
                       ))}
                     </select>
                     <p className='text-xs text-gray-400 mt-1'>
-                      If a state is selected, the article will appear under that state's news section.
+                      {`If a state is selected, the article will appear under that state's news section.`}
                     </p>
                   </Field>
                 </div>
@@ -613,12 +567,5 @@ const CreateNews = () => {
   )
 }
 
-/* tiny helper row for summary card */
-const Row = ({ label, value, mono }) => (
-  <div className='flex items-start justify-between gap-2'>
-    <span className='text-gray-400 shrink-0'>{label}</span>
-    <span className={`text-gray-700 text-right break-all ${mono ? 'font-mono text-xs' : ''}`}>{value}</span>
-  </div>
-)
 
 export default CreateNews

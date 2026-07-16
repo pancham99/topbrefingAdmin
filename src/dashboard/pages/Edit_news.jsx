@@ -19,6 +19,11 @@ const Edit_news = () => {
     const editor = useRef(null)
     const [old_image, set_old_image] = useState('')
     const [title, setTitle] = useState('')
+    const [slug, setSlug] = useState('')
+    const [shortDescription, setShortDesc] = useState('')
+    const [keywords, setKeywords] = useState('')
+    const [metaTitle, setMetaTitle] = useState('')
+    const [metaDescription, setMetaDesc] = useState('')
     const [image, setImage] = useState('')
     const [img, setImg] = useState('')
     const [description, setDescription] = useState('')
@@ -41,6 +46,11 @@ const Edit_news = () => {
         formData.append('new_image', image)
         formData.append('description', description)
         formData.append('old_image', old_image)
+        formData.append('shortDescription', shortDescription)
+        formData.append('keywords', keywords)
+        formData.append('metaTitle', metaTitle)
+        formData.append('metaDescription', metaDescription)
+        formData.append('slug', slug)
 
         try {
             setLoader(true)
@@ -123,6 +133,11 @@ const Edit_news = () => {
             setDescription(data?.news?.description)
             setImg(data?.news?.image)
             set_old_image(data?.news?.image)
+            setShortDesc(data?.news?.shortDescription)
+            setKeywords(data?.news?.keywords)
+            setMetaTitle(data?.news?.metaTitle)
+            setMetaDesc(data?.news?.metaDescription)
+            setSlug(data?.news?.slug)
 
         } catch (error) {
             console.log(error)
@@ -150,6 +165,11 @@ const Edit_news = () => {
                             <input required value={title} onChange={(e) => setTitle(e.target.value)} type='text' placeholder='news title' name='title' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id='title' />
                         </div>
 
+                          <div className='flex flex-col gap-y-2 mb-5'>
+                            <label className='text-md font-medium text-gray-600' htmlFor='slug'>Slug</label>
+                            <input required value={slug} onChange={(e) => setSlug(e.target.value)} type='text' placeholder='news slug' name='slug' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id='slug' />
+                        </div>
+
                         <div className='mb-6'>
                             <label className={`w-full h-[320px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed `} htmlFor='img'>
                                 {
@@ -159,7 +179,7 @@ const Edit_news = () => {
                                     </div>
                                 }
                             </label>
-                            <input  onChange={imageHandle} type='file' id='img' className='hidden' />
+                            <input onChange={imageHandle} type='file' id='img' className='hidden' />
                         </div>
 
                         <div className='flex flex-col gap-y-2 mb-5'>
