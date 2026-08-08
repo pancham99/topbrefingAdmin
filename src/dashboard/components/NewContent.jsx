@@ -134,6 +134,7 @@ const NewContent = () => {
     if (n.isTrending) return 'trending';
     if (n.isFeatured) return 'featured';
     if (n.isPopular) return 'popular';
+    if(n.isHestory) return 'history';
     return 'none';
   };
 
@@ -159,6 +160,7 @@ const NewContent = () => {
     if (type === 'trending') payload.isTrending = true;
     if (type === 'featured') payload.isFeatured = true;
     if (type === 'popular') payload.isPopular = true;
+    if (type === 'history') payload.isHestory = true;
     try {
       const { data } = await updateNewsType(id, payload, store.token);
       toast.success(data.message);
@@ -289,6 +291,7 @@ const NewContent = () => {
                       <option value="trending">Trending</option>
                       <option value="featured">Featured</option>
                       <option value="popular">Popular</option>
+                      <option value="history">History</option>
                     </select>
                   </td>
 
