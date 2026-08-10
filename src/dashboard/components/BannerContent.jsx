@@ -16,7 +16,7 @@ const BannerContent = () => {
     const { store } = useContext(storeContext)
     const [news, setNews] = useState([])
 
-    console.log(news, "banners")
+    // console.log(news, "banners")
 
 
 

@@ -8,6 +8,8 @@ import storeContext from "../../context/storeContext";
 const Subscribers = () => {
   const { store } = useContext(storeContext);
   const [subscribers, setSubscribers] = useState([]);
+  const [pushCount, setPushCount] = useState(0);
+  const [emailCount, setEmailCount] = useState(0);
 
   // ✅ Get all subscribers
   const getSubscribers = async () => {
@@ -19,6 +21,8 @@ const Subscribers = () => {
       });
 
       setSubscribers(data.subscribers || []);
+      setPushCount(data.pushSubscriberCount || 0);
+      setEmailCount(data.emailSubscriberCount || 0);
     } catch (error) {
       console.error("Error fetching subscribers:", error);
       toast.error("Failed to fetch subscribers");
@@ -49,9 +53,20 @@ const Subscribers = () => {
   }, []);
 
   return (
-    <div className="bg-white rounded-md">
-      <div className="flex justify-between p-4">
-        <h2 className="text-xl font-medium">Subscribers</h2>
+    <div className="bg-white rounded-md space-y-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border-b border-gray-100 gap-3">
+        <div>
+          <h2 className="text-xl font-medium">Subscribers</h2>
+          <p className="text-xs text-gray-500">Manage email & web push subscribers</p>
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200 font-semibold">
+            Email: {emailCount}
+          </span>
+          <span className="bg-amber-50 text-amber-700 px-3 py-1 rounded-full border border-amber-200 font-semibold">
+            Web Push: {pushCount}
+          </span>
+        </div>
       </div>
 
       <div className="relative overflow-x-auto p-4">
@@ -59,7 +74,8 @@ const Subscribers = () => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
               <th className="px-7 py-3">No</th>
-              <th className="px-7 py-3">Email</th>
+              <th className="px-7 py-3">Email / Device</th>
+              <th className="px-7 py-3">Subscription Type</th>
               <th className="px-7 py-3">Subscribed Date</th>
               <th className="px-7 py-3">Action</th>
             </tr>
@@ -69,7 +85,26 @@ const Subscribers = () => {
               subscribers.map((s, i) => (
                 <tr key={s._id} className="bg-white border-b">
                   <td className="px-6 py-4">{i + 1}</td>
-                  <td className="px-6 py-4">{s.email}</td>
+                  <td className="px-6 py-4">
+                    <p className="font-medium text-gray-800">{s.email || "Browser Device Subscriber"}</p>
+                    {s.deviceInfo?.platform && (
+                      <p className="text-[11px] text-gray-400">{s.deviceInfo.platform}</p>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-1.5">
+                      {s.email && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-100 text-blue-700">
+                          Email
+                        </span>
+                      )}
+                      {s.fcmToken && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700">
+                          Web Push
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     {new Date(s.createdAt).toLocaleDateString()}
                   </td>
@@ -85,7 +120,7 @@ const Subscribers = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="text-center py-4">
+                <td colSpan="5" className="text-center py-4">
                   No subscribers found
                 </td>
               </tr>
