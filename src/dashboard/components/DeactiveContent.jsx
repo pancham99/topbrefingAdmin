@@ -16,7 +16,7 @@ const DeactiveContent = () => {
 
     const { store } = useContext(storeContext)
     const [news, setNews] = useState([])
-    console.log(news, "news")
+    // console.log(news, "news")
 
 
      const get_video = async () => {

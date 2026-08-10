@@ -7,10 +7,11 @@ import {
   MdArrowBack, MdDelete, MdOutlineThumbUp,
   MdOutlineChatBubbleOutline, MdOpenInNew,
 } from 'react-icons/md'
-import { FaUserCircle, FaHeart } from 'react-icons/fa'
+import { FaUserCircle, FaHeart, FaBell } from 'react-icons/fa'
 import { HiOutlineNewspaper } from 'react-icons/hi2'
 import storeContext from '../../context/storeContext'
 import { base_url } from '../../config/config'
+import { sendNewsNotification } from '../../services/newsService'
 
 /* ── stat card ── */
 const StatCard = ({ icon: Icon, label, value, color }) => (
@@ -59,10 +60,23 @@ const NewsDetails = () => {
   const [likes, setLikes]     = useState([])       // full like objects with user info
   const [likeCount, setLikeCount] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [deleting, setDeleting] = useState(null)
+  const [sendingPush, setSendingPush] = useState(false)
   const [tab, setTab]         = useState('comments') // 'comments' | 'likes'
 
   const headers = { Authorization: `Bearer ${store.token}` }
+
+  const handleSendPush = async () => {
+    try {
+      setSendingPush(true)
+      const { data } = await sendNewsNotification(news_id, store.token)
+      toast.success(data.message || 'Push notification sent to subscribers!')
+    } catch (err) {
+      console.error(err)
+      toast.error(err?.response?.data?.message || 'Failed to send push notification')
+    } finally {
+      setSendingPush(false)
+    }
+  }
 
   const fetchNews = useCallback(async () => {
     const { data } = await axios.get(`${base_url}/api/news/${news_id}`, { headers })
@@ -133,15 +147,26 @@ const NewsDetails = () => {
         >
           <MdArrowBack size={17} /> Back
         </button>
-        <a
-          href={`https://topbriefing.in/news/${news.slug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-xs text-purple-600 border border-purple-200
-                     px-3 py-1.5 rounded-lg hover:bg-purple-50 transition"
-        >
-          <MdOpenInNew size={13} /> View on site
-        </a>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSendPush}
+            disabled={sendingPush}
+            className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200
+                       px-3 py-1.5 rounded-lg hover:bg-amber-100 transition font-semibold cursor-pointer disabled:opacity-50"
+          >
+            <FaBell size={13} className={sendingPush ? 'animate-bounce' : ''} />
+            {sendingPush ? 'Broadcasting...' : 'Broadcast Push Notification'}
+          </button>
+          <a
+            href={`https://topbriefing.in/news/${news.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs text-purple-600 border border-purple-200
+                       px-3 py-1.5 rounded-lg hover:bg-purple-50 transition"
+          >
+            <MdOpenInNew size={13} /> View on site
+          </a>
+        </div>
       </div>
 
       {/* ── stats ── */}

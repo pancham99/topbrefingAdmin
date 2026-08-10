@@ -22,6 +22,14 @@ export const updateNewsStatus = async (id, status) => {
 };
 
 
+export const sendNewsNotification = async (newsId, token) => {
+  return axios.post(`${base_url}/api/news/send-notification/${newsId}`, {}, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+};
+
 export const updateNewsType = async (id, payload) => {
   return axiosInstance.put(
     `/api/news/types-update/${id}`,

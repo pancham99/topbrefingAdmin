@@ -1,7 +1,7 @@
 import {
   useContext, useState, useEffect, useCallback, useMemo,
 } from 'react';
-import { FaEdit } from 'react-icons/fa';
+import { FaEdit, FaBell } from 'react-icons/fa';
 import { MdDelete, MdVisibility } from 'react-icons/md';
 import { HiOutlineSearch } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -18,7 +18,7 @@ import Pagination from './Pagination';
 
 import {
   fetchNews, fetchWriters, deleteNews,
-  updateNewsStatus, updateNewsType,
+  updateNewsStatus, updateNewsType, sendNewsNotification,
 } from '../../services/newsService';
 
 /* ─── status badge ───────────────────────────────────────────── */
@@ -168,6 +168,21 @@ const NewContent = () => {
     } catch { toast.error('Type update failed'); }
   };
 
+  const [sendingPush, setSendingPush] = useState(null);
+
+  const handleSendPush = async (id, title) => {
+    try {
+      setSendingPush(id);
+      const { data } = await sendNewsNotification(id, store.token);
+      toast.success(data.message || `Push notification sent for "${title.slice(0, 20)}..."`);
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || 'Failed to send push notification');
+    } finally {
+      setSendingPush(null);
+    }
+  };
+
   const isAdmin = store?.userInfo?.role === 'admin';
 
   return (
@@ -298,6 +313,16 @@ const NewContent = () => {
                   {/* actions */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
+                      {/* Send Push Notification to all subscribers */}
+                      <button
+                        onClick={() => handleSendPush(n._id, n.title)}
+                        disabled={sendingPush === n._id}
+                        className="p-1.5 rounded-lg text-amber-500 hover:text-amber-600 hover:bg-amber-50 transition disabled:opacity-50"
+                        title="Send Push Notification to Subscribers"
+                      >
+                        <FaBell size={15} className={sendingPush === n._id ? 'animate-bounce' : ''} />
+                      </button>
+
                       {/* View details — available to everyone */}
                       <Link
                         to={`/dashboard/news/details/${n._id}`}
