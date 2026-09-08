@@ -1,5 +1,5 @@
 
-const LIVE_API_URL = 'https://bakendtopbrefing.vercel.app'; // Set your live production backend URL here
+const LIVE_API_URL = 'https://bakendtopbrefing.vercel.app';
 
 const getBaseUrl = () => {
   if (import.meta.env?.VITE_API_URL) {
@@ -7,15 +7,20 @@ const getBaseUrl = () => {
   }
   if (typeof window !== 'undefined' && window.location && window.location.hostname) {
     const hostname = window.location.hostname;
-    if (hostname.includes('topbriefing') || hostname.endsWith('.vercel.app')) {
-      return LIVE_API_URL;
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
+      return 'http://localhost:5001';
     }
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1' && hostname !== '[::1]') {
+    if (
+      /^192\.168\.\d+\.\d+$/.test(hostname) ||
+      /^10\.\d+\.\d+\.\d+$/.test(hostname) ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+$/.test(hostname)
+    ) {
       const protocol = window.location.protocol;
       return `${protocol}//${hostname}:5001`;
     }
+    return LIVE_API_URL;
   }
-  return 'http://localhost:5001';
+  return LIVE_API_URL;
 };
 
 export const base_url = getBaseUrl();
