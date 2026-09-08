@@ -22,12 +22,8 @@ export const updateNewsStatus = async (id, status) => {
 };
 
 
-export const sendNewsNotification = async (newsId, token) => {
-  return axios.post(`${base_url}/api/news/send-notification/${newsId}`, {}, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+export const sendNewsNotification = async (newsId) => {
+  return axiosInstance.post(`/api/news/send-notification/${newsId}`, {});
 };
 
 export const updateNewsType = async (id, payload) => {
@@ -52,12 +48,8 @@ export const updateNewsType = async (id, payload) => {
 
 
 
-export const deleteNews = async (id, token) => {
-  return axios.delete(`${base_url}/api/news/delete/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+export const deleteNews = async (id) => {
+  return axiosInstance.delete(`/api/news/delete/${id}`);
 };
 
 

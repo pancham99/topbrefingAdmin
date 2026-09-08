@@ -1,8 +1,7 @@
 import  { useContext, useEffect, useState } from 'react'
 import { Link } from "react-router-dom"
 // import { FaEye } from "react-icons/fa";
-import axios from 'axios'
-import { base_url } from '../../config/config'
+import axiosInstance from '../../services/axiosInstance'
 import storeContext from '../../context/storeContext'
 import toast from 'react-hot-toast'
 import { MdDelete } from 'react-icons/md';
@@ -13,14 +12,8 @@ const Writers = () => {
 
     const get_writers = async () => {
         try {
-
-            const { data } = await axios.get(`${base_url}/api/news/writers`, {
-                headers: {
-                    'Authorization': `Bearer ${store.token}`
-                }
-            })
-
-            setWriters(data.writers)
+            const { data } = await axiosInstance.get('/api/news/writers')
+            setWriters(data.writers || [])
         } catch (error) {
             console.log(error)
         }
@@ -37,27 +30,24 @@ const Writers = () => {
 
     const update_status = async (status, user_id) => {
         try {
-
             setRes({
                 id: user_id,
                 loader: true
             })
-            const { data } = await axios.put(`${base_url}/api/news/writer_status-update/${user_id}`, { status }, {
-                headers: {
-                    'Authorization': `Bearer ${store.token}`
-                }
-            })
+            const { data } = await axiosInstance.put(`/api/news/writer_status-update/${user_id}`, { status })
             setRes({
                 id: user_id,
                 loader: false
             })
             toast.success(data.message)
             get_writers()
-
-            console.log(data)
         } catch (error) {
+            setRes({
+                id: user_id,
+                loader: false
+            })
             console.log(error.message)
-            toast.error(error.response.data.message)
+            toast.error(error.response?.data?.message || error.message || "Action failed")
         }
     }
 
@@ -69,15 +59,13 @@ const Writers = () => {
                 return;
             }
 
-          await axios.delete(`${base_url}/api/news/writer/delete/${user_id}`, {
-                headers: {
-                    Authorization: `Bearer ${store?.token}`,
-                },
-            });
+            await axiosInstance.delete(`/api/news/writer/delete/${user_id}`)
 
-           get_writers()
+            toast.success("Writer deleted successfully!");
+            get_writers();
         } catch (error) {
-            console.error("Delete failed:", error?.response?.data?.message || error.message);
+            console.error("Failed to delete writer:", error);
+            toast.error(error.response?.data?.message || "Failed to delete writer");
         }
     };
 

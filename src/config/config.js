@@ -5,20 +5,8 @@ const getBaseUrl = () => {
   if (import.meta.env?.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
-  if (typeof window !== 'undefined' && window.location && window.location.hostname) {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
-      return 'http://localhost:5001';
-    }
-    if (
-      /^192\.168\.\d+\.\d+$/.test(hostname) ||
-      /^10\.\d+\.\d+\.\d+$/.test(hostname) ||
-      /^172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+$/.test(hostname)
-    ) {
-      const protocol = window.location.protocol;
-      return `${protocol}//${hostname}:5001`;
-    }
-    return LIVE_API_URL;
+  if (import.meta.env?.VITE_USE_LOCAL_API === 'true') {
+    return 'http://localhost:5001';
   }
   return LIVE_API_URL;
 };
