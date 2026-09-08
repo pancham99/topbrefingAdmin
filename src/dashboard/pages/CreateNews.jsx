@@ -95,10 +95,10 @@ const CreateNews = () => {
     formData.append('keywords', keywords)
     formData.append('category', category)
     formData.append('metaTitle', metaTitle || title)
-    formData.append('metaDescription', metaDescription || shortDescription)
     formData.append('isBreaking', isBreaking)
     formData.append('isFeatured', isFeatured)
     formData.append('isTrending', isTrending)
+    formData.append('status', 'active')
     // slug override (backend will use this if provided, otherwise auto-generates)
     if (slugEdited && slug) formData.append('slug', slug)
 
