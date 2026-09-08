@@ -175,7 +175,7 @@ const DeactiveNewContent = () => {
             console.log(data)
         } catch (error) {
             console.log(error.message)
-            toast.error(error.response.data.message)
+            toast.error(error.response?.data?.message || error.message || "Failed to update status")
         }
     }
 

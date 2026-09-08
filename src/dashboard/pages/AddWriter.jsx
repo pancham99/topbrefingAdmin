@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { Link } from "react-router-dom"
 import toast from 'react-hot-toast'
-import axios from 'axios'
-import { base_url } from '../../config/config'
+import axiosInstance from '../../services/axiosInstance'
 import storeContext from '../../context/storeContext'
 import { useNavigate } from 'react-router-dom'
 
@@ -30,11 +29,7 @@ const AddWriter = () => {
     e.preventDefault()
     try {
       setLoader(true)
-      const { data } = await axios.post(`${base_url}/api/news/writer/add`, state, {
-        headers: {
-          'Authorization': `Bearer ${store.token}`
-        }
-      })
+      const { data } = await axiosInstance.post('/api/news/writer/add', state)
 
       setLoader(false)
       toast.success(data.message)
@@ -42,7 +37,7 @@ const AddWriter = () => {
 
     } catch (error) {
       setLoader(false)
-      toast.error(error.response.data.message)
+      toast.error(error.response?.data?.message || error.message || "Failed to add writer")
       console.log(error)
     }
   }

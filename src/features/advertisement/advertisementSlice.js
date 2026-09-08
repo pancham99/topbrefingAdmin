@@ -1,47 +1,31 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
-import { base_url } from '../../config/config'
-import { data } from 'autoprefixer';
+import axiosInstance from '../../services/axiosInstance'
 
-export const addAdvertisement = createAsyncThunk("advertisement/add", async ({ fd, token }, { rejectWithValue }) => {
-  
+export const addAdvertisement = createAsyncThunk("advertisement/add", async ({ fd }, { rejectWithValue }) => {
     try {
-        const { data } = await axios.post(`${base_url}/api/advertisement/add`, fd, {
+        const { data } = await axiosInstance.post('/api/advertisement/add', fd, {
             headers: {
-                Authorization: `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data',
             },
         });
-        console.log(data, "data from add advertisement slice");
-
         return data;
     } catch (error) {
-        return rejectWithValue(err.response?.data?.message || 'Something went wrong');
+        return rejectWithValue(error.response?.data?.message || 'Something went wrong');
     }
-}
-)
+});
 
-export const fetchAdvertisements = createAsyncThunk("advertisement/fetchAll", async (token, { rejectWithValue }) => {
+export const fetchAdvertisements = createAsyncThunk("advertisement/fetchAll", async (_, { rejectWithValue }) => {
     try {
-        const { data } = await axios.get(`${base_url}/api/advertisement/getall`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        console.log(data, "data from advertisement slice");
+        const { data } = await axiosInstance.get('/api/advertisement/getall');
         return data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || 'Failed to fetch advertisements');
     }
 });
 
-export const deleteAdvertisement = createAsyncThunk("advertisement/delete", async ({ _id, token }, { rejectWithValue }) => {
+export const deleteAdvertisement = createAsyncThunk("advertisement/delete", async ({ _id }, { rejectWithValue }) => {
     try {
-        await axios.delete(`${base_url}/api/advertisement/delete/${_id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        await axiosInstance.delete(`/api/advertisement/delete/${_id}`);
         return _id; 
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || 'Failed to delete advertisement');
@@ -50,15 +34,14 @@ export const deleteAdvertisement = createAsyncThunk("advertisement/delete", asyn
 
 export const updateAdvertisement = createAsyncThunk(
   "advertisement/update",
-  async ({ _id, fd, token }, { rejectWithValue }) => {
+  async ({ _id, fd }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.put(`${base_url}/api/advertisement/update/${_id}`, fd, {
+      const { data } = await axiosInstance.put(`/api/advertisement/update/${_id}`, fd, {
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
-       return data.updatedAdvertisement || data; 
+      return data.updatedAdvertisement || data; 
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update advertisement");
     }
@@ -66,28 +49,18 @@ export const updateAdvertisement = createAsyncThunk(
 );
 
 export const update_ststus_advertisement = createAsyncThunk("advertisement/updateStatus",
-    async ({ _id, status, token }, { rejectWithValue }) => {
+    async ({ _id, status }, { rejectWithValue }) => {
     try {
-        const { data } = await axios.put(`${base_url}/api/advertisement/status/${_id}`, { status }, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const { data } = await axiosInstance.put(`/api/advertisement/status/${_id}`, { status });
         return data.updatedAdvertisement || data;   
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || "Failed to update advertisement status");   
     }
 });
 
-
-export const fetchAdvertisementById = createAsyncThunk("advertisement/fetchById", async ({ _id, token }, { rejectWithValue }) => {
+export const fetchAdvertisementById = createAsyncThunk("advertisement/fetchById", async ({ _id }, { rejectWithValue }) => {
     try {
-        const { data } = await axios.get(`${base_url}/api/advertisement/get/${_id}`, {
-            headers: {  
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        console.log(data, "data from advertisement slice by id");
+        const { data } = await axiosInstance.get(`/api/advertisement/get/${_id}`);
         return data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.message || 'Failed to fetch advertisement by ID');

@@ -2,8 +2,7 @@ import React, { useContext, useState } from "react";
 import { FaImage } from "react-icons/fa";
 import storeContext from "../../context/storeContext";
 import { MdCloudUpload } from "react-icons/md";
-import axios from "axios";
-import { base_url } from "../../config/config";
+import axiosInstance from "../../services/axiosInstance";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import tost from 'react-hot-toast'
@@ -40,14 +39,9 @@ const Profile = () => {
 
     try {
       setLoader("avatar");
-      const { data } = await axios.put(
-        `${base_url}/api/news/update_avatar`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${store.token}`,
-          },
-        }
+      const { data } = await axiosInstance.put(
+        `/api/news/update_avatar`,
+        formData
       );
 
       setLoader("");
@@ -56,19 +50,14 @@ const Profile = () => {
     } catch (error) {
       setLoader("");
       console.error(error);
-      tost.error(error.response.data.message);
+      tost.error(error.response?.data?.message || error.message || "Failed to update image");
     }
   };
 
   const get_profile = async () => {
     try {
-      const { data } = await axios.get(
-        `${base_url}/api/news/get_user`,
-        {
-          headers: {
-            Authorization: `Bearer ${store.token}`,
-          },
-        }
+      const { data } = await axiosInstance.get(
+        `/api/news/get_user`
       );
       serProfile(data);
     } catch (error) {
@@ -97,15 +86,9 @@ const Profile = () => {
 
     try {
       setLoader("password");
-      const { data } = await axios.put(
-        `${base_url}/api/news/rest_user_password`,
-        state,
-        {
-          headers: {
-            Authorization: `Bearer ${store.token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const { data } = await axiosInstance.put(
+        `/api/news/rest_user_password`,
+        state
       );
       setLoader("");
       tost.success(data.message || "Password changed successfully");
@@ -113,7 +96,7 @@ const Profile = () => {
       navigate('/login');
     } catch (error) {
       console.error(error);
-      tost.error(error.response.data.message)
+      tost.error(error.response?.data?.message || error.message || "Failed to reset password");
       setLoader("");
     }
   };

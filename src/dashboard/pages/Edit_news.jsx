@@ -65,7 +65,7 @@ const Edit_news = () => {
 
         } catch (error) {
             setLoader(false)
-            toast.error(error.response.data.message)
+            toast.error(error.response?.data?.message || error.message || "Failed to edit news")
 
         }
     }
@@ -115,7 +115,7 @@ const Edit_news = () => {
         } catch (error) {
 
             setImageLoader(false)
-            toast.error(error.response.data.message)
+            toast.error(error.response?.data?.message || error.message || "Failed to upload image")
             console.log(error)
         }
 

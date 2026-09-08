@@ -1,6 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import axios from "axios";
-import { base_url } from "../../config/config";
+import axiosInstance from "../../services/axiosInstance";
 import toast from "react-hot-toast";
 import { MdDelete } from "react-icons/md";
 import storeContext from "../../context/storeContext";
@@ -14,18 +13,14 @@ const Subscribers = () => {
   // ✅ Get all subscribers
   const getSubscribers = async () => {
     try {
-      const { data } = await axios.get(`${base_url}/get/subscribers`, {
-        headers: {
-          Authorization: `Bearer ${store?.token}`,
-        },
-      });
+      const { data } = await axiosInstance.get('/get/subscribers');
 
       setSubscribers(data.subscribers || []);
       setPushCount(data.pushSubscriberCount || 0);
       setEmailCount(data.emailSubscriberCount || 0);
     } catch (error) {
       console.error("Error fetching subscribers:", error);
-      toast.error("Failed to fetch subscribers");
+      toast.error(error?.response?.data?.message || error.message || "Failed to fetch subscribers");
     }
   };
 
@@ -34,11 +29,7 @@ const Subscribers = () => {
     try {
       if (!id) return toast.error("Invalid subscriber ID");
 
-      await axios.delete(`${base_url}/api/subscribers/${id}`, {
-        headers: {
-          Authorization: `Bearer ${store?.token}`,
-        },
-      });
+      await axiosInstance.delete(`/api/subscribers/${id}`);
 
       toast.success("Subscriber deleted successfully");
       getSubscribers();

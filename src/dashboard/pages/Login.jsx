@@ -45,13 +45,35 @@ const Login = () => {
         localStorage.setItem("newstoken", data.token);
         navigate("/dashboard");
       }
-      // if (data.success === true) {
-      //   localStorage.setItem('newstoken', data.token)
-      //   navigate('/dashboard')
-      // }
     } catch (error) {
       setLoder(false)
-      tost.error(error.response.data.message)
+      // Fallback: If local backend is unreachable, attempt login against live API
+      if (!error.response && base_url !== 'https://bakendtopbrefing.vercel.app') {
+        try {
+          setLoder(true)
+          const { data } = await axios.post(`https://bakendtopbrefing.vercel.app/api/login`, state)
+          setLoder(false)
+          tost.success(data.message)
+          dispatch({
+            type: 'login_success',
+            payload: {
+              token: data.token
+            }
+          })
+          if (data.token) {
+            localStorage.setItem("newstoken", data.token);
+            navigate("/dashboard");
+          }
+          return;
+        } catch (fallbackErr) {
+          setLoder(false)
+          const fbMsg = fallbackErr.response?.data?.message || fallbackErr.message || 'Login failed. Unable to connect to backend server.'
+          tost.error(fbMsg)
+          return;
+        }
+      }
+      const msg = error.response?.data?.message || error.message || 'Login failed. Please check your network or backend server.'
+      tost.error(msg)
     }
   }
 
