@@ -1,8 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
-import { base_url } from '../../config/config';
-import storeContext from '../../context/storeContext';
-import axios from 'axios';
 import NewContent from '../components/NewContent';
+import { useGetNews } from '../../hooks/api/useNewsQueries';
 import {
   HiOutlineNewspaper,
   HiOutlineCheckCircle,
@@ -44,25 +41,8 @@ const StatCard = ({ label, value, icon: Icon, color, loading }) => {
 
 /* ═══════════════════════════════════════════════════════════ */
 const WriterIndex = () => {
-  const { store } = useContext(storeContext);
-  const [all_news, set_all_news] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const get_news = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`${base_url}/api/news`, {
-        headers: { Authorization: `Bearer ${store.token}` },
-      });
-      set_all_news(data.news);
-    } catch (error) {
-      console.log(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { get_news(); }, []);
+  const { data, isLoading: loading } = useGetNews();
+  const all_news = data?.news || [];
 
   const pendingNews  = all_news.filter((n) => n.status === 'pending');
   const activeNews   = all_news.filter((n) => n.status === 'active');
@@ -77,7 +57,6 @@ const WriterIndex = () => {
 
   return (
     <div className="space-y-6">
-
       {/* page header */}
       <div>
         <h1 className="text-xl font-bold text-gray-800">My Dashboard</h1>

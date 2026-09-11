@@ -1,4 +1,4 @@
-import { useRef, useContext, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   MdCloudUpload, MdAutoAwesome,
@@ -8,27 +8,26 @@ import { FiExternalLink } from 'react-icons/fi'
 import JoditEditor from 'jodit-react'
 import Galler from '../components/Galler'
 import { base_url } from '../../config/config'
-import axios from 'axios'
-import storeContext from '../../context/storeContext'
+import axiosInstance from '../../api/axiosInstance'
 import toast from 'react-hot-toast'
 import SectionHead from '../components/news/SectionHead'
 import Field from '../components/news/Field'
 import Row from '../components/news/Row'
 import { CATEGORIES, STATES } from '../../constant/Data'
+import { useCreateNewsMutation } from '../../hooks/api/useNewsQueries'
+
 const inputCls =
   'w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm outline-none ' +
   'focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition bg-white placeholder-gray-400'
 
-/* ═══════════════════════════════════════════════════════════ */
 const CreateNews = () => {
   const navigate = useNavigate()
-  const { store } = useContext(storeContext)
   const editor = useRef(null)
 
   /* ── form state ── */
   const [title, setTitle]                   = useState('')
   const [slug, setSlug]                     = useState('')
-  const [slugEdited, setSlugEdited]         = useState(false)   // user manually edited slug
+  const [slugEdited, setSlugEdited]         = useState(false)
   const [image, setImage]                   = useState(null)
   const [imgPreview, setImgPreview]         = useState('')
   const [description, setDescription]       = useState('')
@@ -43,19 +42,26 @@ const CreateNews = () => {
   const [isTrending, setIsTrending]         = useState(false)
 
   /* ── ui state ── */
-  const [loader, setLoader]   = useState(false)
   const [show, setShow]       = useState(false)
   const [images, setImages]   = useState([])
-  const [activeTab, setActiveTab] = useState('content') // content | seo | settings
+  const [activeTab, setActiveTab] = useState('content')
 
-  /* ── auto-generate slug from title ── */
+  const createNewsMutation = useCreateNewsMutation({
+    onSuccess: (data) => {
+      toast.success(data?.message || "Article published successfully");
+      navigate('/dashboard/news');
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || 'Something went wrong');
+    },
+  });
+
   useEffect(() => {
     if (!slug && title) {
-      setSlug((title))
+      setSlug(title)
     }
   }, [title, slug])
 
-  /* ── image pick ── */
   const imageHandle = (e) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -69,22 +75,18 @@ const CreateNews = () => {
     setImage(null)
   }
 
-  /* ── gallery images ── */
   const get_image = useCallback(async () => {
     try {
-      const { data } = await axios.get(`${base_url}/api/images`, {
-        headers: { Authorization: `Bearer ${store.token}` },
-      })
+      const { data } = await axiosInstance.get('/api/images')
       setImages(data.images)
     } catch (e) {
       console.log(e)
     }
-  }, [store.token])
+  }, [])
 
   useEffect(() => { get_image() }, [get_image])
 
-  /* ── submit ── */
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     const formData = new FormData()
     formData.append('title', title)
@@ -99,38 +101,22 @@ const CreateNews = () => {
     formData.append('isFeatured', isFeatured)
     formData.append('isTrending', isTrending)
     formData.append('status', 'active')
-    // slug override (backend will use this if provided, otherwise auto-generates)
     if (slugEdited && slug) formData.append('slug', slug)
 
-    try {
-      setLoader(true)
-      const { data } = await axios.post(`${base_url}/api/news/add`, formData, {
-        headers: { Authorization: `Bearer ${store.token}` },
-      })
-      toast.success(data.message)
-      navigate('/dashboard/news')
-    } catch (error) {
-      toast.error(error?.response?.data?.message || 'Something went wrong')
-      navigate('/dashboard/serverDown')
-    } finally {
-      setLoader(false)
-    }
+    createNewsMutation.mutate(formData);
   }
 
-  /* ── tab nav ── */
   const tabs = [
     { id: 'content',  label: 'Content',  icon: MdArticle },
     { id: 'seo',      label: 'SEO',      icon: MdAutoAwesome },
     { id: 'settings', label: 'Settings', icon: MdTune },
   ]
 
-  /* ── char counters ── */
   const metaTitleLen = (metaTitle || title).length
   const metaDescLen  = (metaDescription || shortDescription).length
 
   return (
     <div className='min-h-screen bg-gray-50'>
-
       {/* ─── top bar ─── */}
       <div className='bg-white border-b border-gray-200 sticky top-0 z-10'>
         <div className='max-w-7xl mx-auto px-4 py-3 flex items-center justify-between'>
@@ -153,11 +139,11 @@ const CreateNews = () => {
             <button
               form='create-news-form'
               type='submit'
-              disabled={loader}
+              disabled={createNewsMutation.isPending}
               className='px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 
                          disabled:opacity-60 disabled:cursor-not-allowed transition flex items-center gap-2'
             >
-              {loader ? (
+              {createNewsMutation.isPending ? (
                 <>
                   <span className='w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin' />
                   Publishing…
@@ -190,15 +176,10 @@ const CreateNews = () => {
       <form id='create-news-form' onSubmit={handleSubmit}>
         <div className='max-w-7xl mx-auto px-4 py-6'>
           <div className='flex flex-col xl:flex-row gap-6'>
-
-            {/* ════════ LEFT: main content area ════════ */}
+            {/* LEFT */}
             <div className='flex-1 min-w-0'>
-
-              {/* ── CONTENT TAB ── */}
               {activeTab === 'content' && (
                 <div className='space-y-5'>
-
-                  {/* Title card */}
                   <div className='bg-white rounded-xl border border-gray-200 p-5'>
                     <SectionHead icon={MdArticle} label='Article Content' />
 
@@ -214,7 +195,6 @@ const CreateNews = () => {
                       />
                     </Field>
 
-                    {/* Slug field */}
                     <Field
                       label='URL Slug'
                       hint={
@@ -229,10 +209,7 @@ const CreateNews = () => {
                           value={slug}
                           onChange={(e) => {
                             setSlugEdited(true)
-                            setSlug(e.target.value
-                              .toLowerCase()
-                            // collapse multiple hyphens
-                            )
+                            setSlug(e.target.value.toLowerCase())
                           }}
                           type='text'
                           placeholder='auto-generated-from-title'
@@ -267,7 +244,6 @@ const CreateNews = () => {
                     </Field>
                   </div>
 
-                  {/* Rich editor card */}
                   <div className='bg-white rounded-xl border border-gray-200 p-5'>
                     <div className='flex items-center justify-between mb-4 pb-2 border-b border-gray-100'>
                       <div className='flex items-center gap-2'>
@@ -291,16 +267,13 @@ const CreateNews = () => {
                       onChange={() => {}}
                     />
                   </div>
-
                 </div>
               )}
 
-              {/* ── SEO TAB ── */}
               {activeTab === 'seo' && (
                 <div className='bg-white rounded-xl border border-gray-200 p-5'>
                   <SectionHead icon={MdAutoAwesome} label='SEO & Meta Tags' />
 
-                  {/* Google preview */}
                   <div className='mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200'>
                     <p className='text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide'>Google Preview</p>
                     <p className='text-[17px] text-blue-700 font-medium leading-tight truncate'>
@@ -388,12 +361,10 @@ const CreateNews = () => {
                 </div>
               )}
 
-              {/* ── SETTINGS TAB ── */}
               {activeTab === 'settings' && (
                 <div className='bg-white rounded-xl border border-gray-200 p-5'>
                   <SectionHead icon={MdTune} label='Article Settings' />
 
-                  {/* News type flags */}
                   <div className='mb-6'>
                     <p className='text-sm font-medium text-gray-700 mb-3'>News Type Flags</p>
                     <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
@@ -424,7 +395,6 @@ const CreateNews = () => {
                     </div>
                   </div>
 
-                  {/* Category */}
                   <Field label='Category'>
                     <select
                       value={category}
@@ -438,7 +408,6 @@ const CreateNews = () => {
                     </select>
                   </Field>
 
-                  {/* State */}
                   <Field label='State (राज्य)' hint='Leave blank if not state-specific'>
                     <select
                       value={state}
@@ -450,18 +419,13 @@ const CreateNews = () => {
                         <option key={s} value={s}>{s}</option>
                       ))}
                     </select>
-                    <p className='text-xs text-gray-400 mt-1'>
-                      {`If a state is selected, the article will appear under that state's news section.`}
-                    </p>
                   </Field>
                 </div>
               )}
             </div>
 
-            {/* ════════ RIGHT: sidebar ════════ */}
+            {/* RIGHT sidebar */}
             <div className='w-full xl:w-72 shrink-0 space-y-4'>
-
-              {/* Cover Image */}
               <div className='bg-white rounded-xl border border-gray-200 p-4'>
                 <SectionHead icon={MdImage} label='Cover Image' />
 
@@ -507,7 +471,6 @@ const CreateNews = () => {
                 />
               </div>
 
-              {/* Summary card */}
               <div className='bg-white rounded-xl border border-gray-200 p-4'>
                 <p className='text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3'>Article Summary</p>
                 <div className='space-y-2 text-sm'>
@@ -522,34 +485,18 @@ const CreateNews = () => {
                   <Row label='Keywords' value={keywords ? `${keywords.split(',').filter(Boolean).length} added` : '—'} />
                 </div>
               </div>
-
-              {/* Quick tips */}
-              <div className='bg-blue-50 rounded-xl border border-blue-100 p-4'>
-                <p className='text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2'>SEO Tips</p>
-                <ul className='space-y-1.5 text-xs text-blue-600'>
-                  <li>✅ Title: 50–60 characters</li>
-                  <li>✅ Meta description: 120–155 chars</li>
-                  <li>✅ Use 5–10 relevant keywords</li>
-                  <li>✅ Slug: short, hyphen-separated</li>
-                  <li>✅ Add a high-quality cover image</li>
-                </ul>
-              </div>
-
             </div>
           </div>
         </div>
       </form>
 
-      {/* hidden gallery input */}
       <input
         onChange={async (e) => {
           const files = e.target.files
           try {
             const fd = new FormData()
             for (let i = 0; i < files.length; i++) fd.append('images', files[i])
-            const { data } = await axios.post(`${base_url}/api/images/add`, fd, {
-              headers: { Authorization: `Bearer ${store.token}` },
-            })
+            const { data } = await axiosInstance.post('/api/images/add', fd)
             setImages((prev) => [...prev, ...data.images])
             toast.success(data.message)
           } catch (err) {
@@ -566,6 +513,5 @@ const CreateNews = () => {
     </div>
   )
 }
-
 
 export default CreateNews

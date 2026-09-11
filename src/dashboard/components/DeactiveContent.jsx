@@ -1,64 +1,27 @@
-import React, { useRef, useContext, useState, useEffect } from 'react'
-import { FaEye } from "react-icons/fa";
-import { FaEdit } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
-import { Link, useLocation } from 'react-router-dom'
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import axios from 'axios'
-import { base_url } from '../../config/config'
-import storeContext from '../../context/storeContext'
-import { convert } from 'html-to-text'
-import toast from 'react-hot-toast'
-import { MdDelete } from "react-icons/md";
-
+import { useGetNews } from '../../hooks/api/useNewsQueries';
 
 const DeactiveContent = () => {
+  const { data, isLoading } = useGetNews('status=deactive');
+  const deactiveNews = data?.news || [];
 
-    const { store } = useContext(storeContext)
-    const [news, setNews] = useState([])
-    // console.log(news, "news")
-
-
-     const get_video = async () => {
-        try {
-            const { data } = await axios.get(`http://localhost:5000/api/news/deactive_news`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            setNews(data?.data || []);
-            // console.log(data.data, "video data")
-        } catch (error) {
-            console.log(error.message)
-        }
-    }
-
-
-
-
-
-    useEffect(() => {
-        get_video()
-
-
-    }, [])
-
-
-
-
- 
-
-    
-
-
-
-
-    return (
-        <div>
-            henws
-
+  return (
+    <div className="p-4">
+      {isLoading ? (
+        <p className="text-gray-500">Loading deactivated content...</p>
+      ) : deactiveNews.length === 0 ? (
+        <p className="text-gray-500">No deactivated news found.</p>
+      ) : (
+        <div className="space-y-2">
+          {deactiveNews.map((n) => (
+            <div key={n._id} className="p-3 border rounded bg-white">
+              <h3 className="font-semibold text-gray-800">{n.title}</h3>
+              <p className="text-xs text-gray-500">{n.category}</p>
+            </div>
+          ))}
         </div>
-    )
-}
+      )}
+    </div>
+  );
+};
 
-export default DeactiveContent
+export default DeactiveContent;

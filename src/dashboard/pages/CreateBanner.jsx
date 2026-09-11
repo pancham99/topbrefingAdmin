@@ -1,80 +1,57 @@
-import { base_url } from '../../config/config'
-import axios from "axios";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import storeContext from "../../context/storeContext";
 import { MdCloudUpload } from "react-icons/md";
-import toast from 'react-hot-toast'
+import toast from 'react-hot-toast';
+import { useAddBannerMutation } from "../../hooks/api/useBannerQueries";
 
 const CreateBanner = () => {
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
-  const { store } = useContext(storeContext)
-  const [loader, setLoader] = useState(false)
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     image: "",
-    // videos: "",
     device: "",
     bannertype: "",
     day: "",
   });
 
-  console.log(formData, "formData");
-
   const [preview, setPreview] = useState(null);
-  const [videoPreview, setVideoPreview] = useState(null);
+
+  const addBannerMutation = useAddBannerMutation({
+    onSuccess: (data) => {
+      toast.success(data?.message || "Banner added successfully");
+      navigate("/dashboard/banner");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || error.message || "Something went wrong");
+    },
+  });
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-
     if (type === "file") {
-      if (name === "image") {
+      if (name === "image" && files.length > 0) {
         setFormData({ ...formData, image: files[0] });
         setPreview(URL.createObjectURL(files[0]));
       }
-      // else if (name === "videos") {
-      //   setFormData({ ...formData, videos: files[0] });
-      //   setVideoPreview(URL.createObjectURL(files[0]));
-      // }
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  const added = async (e) => {
+  const added = (e) => {
     e.preventDefault();
-    setLoader(true);
+    const fd = new FormData();
+    fd.append("title", formData.title);
+    fd.append("description", formData.description);
+    fd.append("image", formData.image);
+    fd.append("device", formData.device);
+    fd.append("bannertype", formData.bannertype);
+    fd.append("day", formData.day);
 
-    try {
-      const fd = new FormData();
-      fd.append("title", formData.title);
-      fd.append("description", formData.description);
-      fd.append("image", formData.image); // file object
-      // fd.append("videos", formData.videos);
-      fd.append("device", formData.device);
-      fd.append("bannertype", formData.bannertype);
-      fd.append("day", formData.day);
-
-      const { data } = await axios.post(`${base_url}/api/banner/add`, fd, {
-        headers: {
-          'Authorization': `Bearer ${store.token}`,
-          'Content-Type': 'multipart/form-data' // very important
-        }
-      });
-
-      setLoader(false);
-      toast.success(data.message);
-      navigate("/dashboard/banner");
-
-    } catch (error) {
-      setLoader(false);
-      console.error(error);
-      toast.error(error.response?.data?.message || 'Something went wrong');
-    }
+    addBannerMutation.mutate(fd);
   };
-
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow rounded-md">
@@ -102,47 +79,19 @@ const CreateBanner = () => {
         />
 
         {/* Image Upload */}
-
         <div className='mb-6'>
-          <label className={`w-full h-[320px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed `} htmlFor='img'>
-            {
-              preview ? <img src={preview} alt='' className='h-full w-full' /> : <div className='flex justify-center  items-center flex-col gap-y-2'>
+          <label className="w-full h-[320px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed" htmlFor='img'>
+            {preview ? (
+              <img src={preview} alt='' className='h-full w-full object-contain' />
+            ) : (
+              <div className='flex justify-center items-center flex-col gap-y-2'>
                 <span className='text-2xl'><MdCloudUpload /></span>
                 <span>Select Image</span>
               </div>
-            }
+            )}
           </label>
           <input required onChange={handleChange} type='file' accept="image/*" name="image" id='img' className='hidden' />
         </div>
-
-
-        {/* Video Upload */}
-        {/* <div className='mb-6'>
-          <label className={`w-full h-[180px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed `} htmlFor='video'>
-            {
-              videoPreview ? (
-                <video src={videoPreview} controls className='h-full w-full' />
-              ) : (
-                <div className='flex justify-center items-center flex-col gap-y-2'>
-                  <span className='text-2xl'><MdCloudUpload /></span>
-                  <span>Select Video (optional)</span>
-                </div>
-              )
-            }
-          </label>
-          <input onChange={handleChange} type='file' accept="video/*" name="videos" id='video' className='hidden' />
-        </div> */}
-
-
-        {/* Link */}
-        {/* <input
-          type="url"
-          name="link"
-          placeholder="https://example.com"
-          value={formData.link}
-          onChange={handleChange}
-          className="w-full border rounded p-2"
-        /> */}
 
         {/* Device Type */}
         <select
@@ -150,7 +99,6 @@ const CreateBanner = () => {
           value={formData.device}
           onChange={handleChange}
           className="w-full border rounded p-2"
-
         >
           <option value="">Select Device Type</option>
           <option value="mobile">Mobile</option>
@@ -163,7 +111,6 @@ const CreateBanner = () => {
           value={formData.bannertype}
           onChange={handleChange}
           className="w-full border rounded p-2"
-
         >
           <option value="">Select Banner Type</option>
           <option value="advertisement">advertisement</option>
@@ -173,8 +120,6 @@ const CreateBanner = () => {
           <option value="Banner">Banner</option>
         </select>
 
-
-        {/* ✅ Show Add Day Option Conditionally */}
         {["advertisement", "announcement", "promotion", "custom"].includes(formData.bannertype) && (
           <div>
             <label htmlFor="day" className="block mt-4 mb-1 font-medium">Add Day</label>
@@ -193,15 +138,15 @@ const CreateBanner = () => {
 
         {/* Submit */}
         <button
-
-          disabled={loader}
+          type="submit"
+          disabled={addBannerMutation.isPending}
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
         >
-          {loader ? "Submitting..." : "Add Banner"}
+          {addBannerMutation.isPending ? "Submitting..." : "Add Banner"}
         </button>
       </form>
     </div>
   );
-}
+};
 
-export default CreateBanner
+export default CreateBanner;

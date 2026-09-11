@@ -1,47 +1,26 @@
-import { useEffect, useState, useContext } from "react";
-import axiosInstance from "../../services/axiosInstance";
 import toast from "react-hot-toast";
 import { MdDelete } from "react-icons/md";
-import storeContext from "../../context/storeContext";
+import { useGetSubscribers, useDeleteSubscriberMutation } from "../../hooks/api/useSubscriberQueries";
 
 const Subscribers = () => {
-  const { store } = useContext(storeContext);
-  const [subscribers, setSubscribers] = useState([]);
-  const [pushCount, setPushCount] = useState(0);
-  const [emailCount, setEmailCount] = useState(0);
+  const { data, isLoading } = useGetSubscribers();
+  const subscribers = data?.subscribers || [];
+  const pushCount = data?.pushSubscriberCount || 0;
+  const emailCount = data?.emailSubscriberCount || 0;
 
-  // ✅ Get all subscribers
-  const getSubscribers = async () => {
-    try {
-      const { data } = await axiosInstance.get('/get/subscribers');
-
-      setSubscribers(data.subscribers || []);
-      setPushCount(data.pushSubscriberCount || 0);
-      setEmailCount(data.emailSubscriberCount || 0);
-    } catch (error) {
-      console.error("Error fetching subscribers:", error);
-      toast.error(error?.response?.data?.message || error.message || "Failed to fetch subscribers");
-    }
-  };
-
-  // ✅ Delete subscriber
-  const deleteSubscriber = async (id) => {
-    try {
-      if (!id) return toast.error("Invalid subscriber ID");
-
-      await axiosInstance.delete(`/api/subscribers/${id}`);
-
+  const deleteSubscriberMutation = useDeleteSubscriberMutation({
+    onSuccess: () => {
       toast.success("Subscriber deleted successfully");
-      getSubscribers();
-    } catch (error) {
-      console.error("Delete failed:", error?.response?.data?.message || error.message);
-      toast.error(error?.response?.data?.message || "Delete failed");
-    }
-  };
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || error.message || "Delete failed");
+    },
+  });
 
-  useEffect(() => {
-    getSubscribers();
-  }, []);
+  const deleteSubscriber = (id) => {
+    if (!id) return toast.error("Invalid subscriber ID");
+    deleteSubscriberMutation.mutate(id);
+  };
 
   return (
     <div className="bg-white rounded-md space-y-3">
@@ -72,7 +51,13 @@ const Subscribers = () => {
             </tr>
           </thead>
           <tbody>
-            {subscribers.length > 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan="5" className="text-center py-6 text-gray-500">
+                  Loading subscribers...
+                </td>
+              </tr>
+            ) : subscribers.length > 0 ? (
               subscribers.map((s, i) => (
                 <tr key={s._id} className="bg-white border-b">
                   <td className="px-6 py-4">{i + 1}</td>
@@ -101,6 +86,7 @@ const Subscribers = () => {
                   </td>
                   <td className="px-6 py-4">
                     <button
+                      disabled={deleteSubscriberMutation.isPending && deleteSubscriberMutation.variables === s._id}
                       onClick={() => deleteSubscriber(s._id)}
                       className="p-[6px] rounded hover:shadow-lg hover:shadow-red-500/50"
                     >

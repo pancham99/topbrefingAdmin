@@ -1,18 +1,16 @@
-import { base_url } from '../../config/config'
+import { useState } from "react";
 import axios from "axios";
-import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import storeContext from "../../context/storeContext";
 import { MdCloudUpload } from "react-icons/md";
-import toast from 'react-hot-toast'
+import toast from 'react-hot-toast';
+import { useAddVideoMutation } from "../../hooks/api/useVideoQueries";
 
 const CLOUD_NAME = "dj4c3c8oy";
-const UPLOAD_PRESET = "topbriefing_upload"; // Make sure this preset exists and is unsigned
+const UPLOAD_PRESET = "topbriefing_upload";
 
 const AddVideoContent = () => {
   const navigate = useNavigate();
-  const { store } = useContext(storeContext);
-  const [loader, setLoader] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
     videos: "",
@@ -21,6 +19,16 @@ const AddVideoContent = () => {
 
   const [videoPreview, setVideoPreview] = useState(null);
   const [uploading, setUploading] = useState(false);
+
+  const addVideoMutation = useAddVideoMutation({
+    onSuccess: (data) => {
+      toast.success(data?.message || "Video added successfully");
+      navigate("/dashboard/video");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || error.message || 'Something went wrong');
+    },
+  });
 
   const handleChange = async (e) => {
     const { name, value, type, files } = e.target;
@@ -63,7 +71,7 @@ const AddVideoContent = () => {
     }
   };
 
-  const added = async (e) => {
+  const added = (e) => {
     e.preventDefault();
 
     if (uploading) {
@@ -78,31 +86,8 @@ const AddVideoContent = () => {
       toast.error("Please fill all required fields.");
       return;
     }
-    setLoader(true);
 
-    try {
-      // Send as JSON, not FormData
-      const payload = {
-        title: formData.title,
-        videos: formData.videos, // This is the Cloudinary URL
-        videotype: formData.videotype
-      };
-
-      const { data } = await axios.post(`${base_url}/api/video/add`, payload, {
-        headers: {
-          'Authorization': `Bearer ${store.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      setLoader(false);
-      toast.success(data.message);
-      navigate("/dashboard/video");
-    } catch (error) {
-      setLoader(false);
-      console.error(error);
-      toast.error(error.response?.data?.message || 'Something went wrong');
-    }
+    addVideoMutation.mutate(formData);
   };
 
   return (
@@ -122,22 +107,20 @@ const AddVideoContent = () => {
 
         {/* Video Upload */}
         <div className='mb-6'>
-          <label className={`w-full h-[180px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed`} htmlFor='video'>
-            {
-              videoPreview ? (
-                <video src={videoPreview} controls className='h-full w-full' />
-              ) : (
-                <div className='flex justify-center items-center flex-col gap-y-2'>
-                  <span className='text-2xl'><MdCloudUpload /></span>
-                  <span>Select Video (optional)</span>
-                </div>
-              )
-            }
+          <label className="w-full h-[180px] flex rounded text-[#404040] justify-center items-center gap-2 cursor-pointer border-2 border-dashed" htmlFor='video'>
+            {videoPreview ? (
+              <video src={videoPreview} controls className='h-full w-full' />
+            ) : (
+              <div className='flex justify-center items-center flex-col gap-y-2'>
+                <span className='text-2xl'><MdCloudUpload /></span>
+                <span>Select Video (optional)</span>
+              </div>
+            )}
           </label>
           <input onChange={handleChange} type='file' accept="video/*" name="videos" id='video' className='hidden' />
         </div>
 
-        {/* Banner Type */}
+        {/* Video Type */}
         <select
           name="videotype"
           value={formData.videotype}
@@ -145,7 +128,7 @@ const AddVideoContent = () => {
           className="w-full border rounded p-2"
           required
         >
-          <option value="">Select Banner Type</option>
+          <option value="">Select Video Type</option>
           <option value="advertisement">advertisement</option>
           <option value="announcement">announcement</option>
           <option value="promotion">promotion</option>
@@ -156,13 +139,13 @@ const AddVideoContent = () => {
         <button
           type="submit"
           disabled={
-            loader ||
+            addVideoMutation.isPending ||
             uploading ||
             (videoPreview && !formData.videos)
           }
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50"
         >
-          {loader
+          {addVideoMutation.isPending
             ? "Submitting..."
             : uploading
               ? "Uploading Video..."
@@ -171,6 +154,6 @@ const AddVideoContent = () => {
       </form>
     </div>
   );
-}
+};
 
-export default AddVideoContent
+export default AddVideoContent;
