@@ -1,5 +1,5 @@
 import {
-  useContext, useState, useEffect, useCallback, useMemo,
+  useContext, useState, useEffect, useMemo,
 } from 'react';
 import { FaEdit, FaBell } from 'react-icons/fa';
 import { MdDelete, MdVisibility } from 'react-icons/md';
@@ -17,12 +17,16 @@ import FilterType from './fillter/FilterType';
 import Pagination from './Pagination';
 
 import {
-  fetchNews, fetchWriters, deleteNews,
-  updateNewsStatus, updateNewsType, sendNewsNotification,
-} from '../../services/newsService';
+  useGetNews,
+  useDeleteNewsMutation,
+  useUpdateNewsStatusMutation,
+  useUpdateNewsTypeMutation,
+  useSendNewsNotificationMutation,
+} from '../../hooks/api/useNewsQueries';
+import { useGetWriters } from '../../hooks/api/useAuthQueries';
 
 /* ─── status badge ───────────────────────────────────────────── */
-const StatusBadge = ({ status, onClick, isAdmin }) => {
+const StatusBadge = ({ status, onClick, isAdmin, isUpdating }) => {
   const map = {
     active: 'bg-green-100 text-green-700 border-green-200',
     pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -35,7 +39,7 @@ const StatusBadge = ({ status, onClick, isAdmin }) => {
         ${map[status] ?? 'bg-gray-100 text-gray-600 border-gray-200'}
         ${isAdmin ? 'cursor-pointer hover:opacity-80 transition' : ''}`}
     >
-      {status}
+      {isUpdating ? 'Loading...' : status}
     </span>
   );
 };
@@ -61,7 +65,7 @@ const RowSkeleton = () => (
   <>
     {Array.from({ length: 8 }).map((_, i) => (
       <tr key={i} className="border-b border-gray-50 animate-pulse">
-        {Array.from({ length: 9 }).map((__, j) => (
+        {Array.from({ length: 8 }).map((__, j) => (
           <td key={j} className="px-4 py-3">
             <div className="h-3 bg-gray-200 rounded w-full" />
           </td>
@@ -75,14 +79,8 @@ const RowSkeleton = () => (
 const NewContent = () => {
   const { store } = useContext(storeContext);
 
-  const [news, setNews] = useState([]);
-  const [writers, setWriters] = useState([]);
-  const [loading, setLoading] = useState(false);
-
   const [page, setPage] = useState(1);
   const [parPage, setPerPage] = useState(20);
-  const [pages, setPages] = useState(0);
-  const [total, setTotal] = useState('');
 
   const [status, setStatus] = useState('');
   const [category, setCategory] = useState('');
@@ -104,26 +102,49 @@ const NewContent = () => {
     startDate, endDate, type,
   }).toString(), [page, parPage, status, category, writer, debouncedSearch, startDate, endDate, type]);
 
-  const getNews = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { data } = await fetchNews(query, store.token);
-      setNews(data.news);
-      setPages(data.pages);
-      setTotal(data.total);
-    } catch (e) { console.log(e); }
-    finally { setLoading(false); }
-  }, [query, store.token]);
+  const { data: newsData, isLoading: loading } = useGetNews(query);
+  const news = newsData?.news || [];
+  const pages = newsData?.pages || 0;
+  const total = newsData?.total || 0;
 
-  const getWriters = useCallback(async () => {
-    try {
-      const { data } = await fetchWriters(store.token);
-      setWriters(data.writers);
-    } catch (e) { console.log(e); }
-  }, [store.token]);
+  const { data: writersData } = useGetWriters();
+  const writers = writersData?.writers || [];
 
-  useEffect(() => { getNews(); }, [getNews]);
-  useEffect(() => { getWriters(); }, [getWriters]);
+  const deleteNewsMutation = useDeleteNewsMutation({
+    onSuccess: () => {
+      toast.success('News deleted');
+    },
+    onError: () => {
+      toast.error('Delete failed');
+    },
+  });
+
+  const updateStatusMutation = useUpdateNewsStatusMutation({
+    onSuccess: (data) => {
+      toast.success(data?.message || 'Status updated');
+    },
+    onError: () => {
+      toast.error('Status update failed');
+    },
+  });
+
+  const updateTypeMutation = useUpdateNewsTypeMutation({
+    onSuccess: (data) => {
+      toast.success(data?.message || 'Type updated');
+    },
+    onError: () => {
+      toast.error('Type update failed');
+    },
+  });
+
+  const sendNotificationMutation = useSendNewsNotificationMutation({
+    onSuccess: (data) => {
+      toast.success(data?.message || 'Push notification sent to subscribers!');
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || 'Failed to send push notification');
+    },
+  });
 
   const formatTime = (date) =>
     new Intl.DateTimeFormat('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
@@ -134,60 +155,38 @@ const NewContent = () => {
     if (n.isTrending) return 'trending';
     if (n.isFeatured) return 'featured';
     if (n.isPopular) return 'popular';
-    if(n.isHestory) return 'history';
+    if (n.isHestory) return 'history';
     return 'none';
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteNews(id, store.token);
-      toast.success('News deleted');
-      setNews((prev) => prev.filter((n) => n._id !== id));
-    } catch { toast.error('Delete failed'); }
+  const handleDelete = (id) => {
+    if (!id) return;
+    deleteNewsMutation.mutate(id);
   };
 
-  const handleStatus = async (status, id) => {
-    try {
-      const { data } = await updateNewsStatus(id, status, store.token);
-      toast.success(data.message);
-      setNews((prev) => prev.map((n) => n._id === id ? { ...n, status } : n));
-    } catch { toast.error('Status update failed'); }
+  const handleStatus = (statusVal, id) => {
+    updateStatusMutation.mutate({ id, status: statusVal });
   };
 
-  const handleType = async (type, id) => {
+  const handleType = (typeVal, id) => {
     const payload = { isBreaking: false, isTrending: false, isFeatured: false, isPopular: false };
-    if (type === 'breaking') payload.isBreaking = true;
-    if (type === 'trending') payload.isTrending = true;
-    if (type === 'featured') payload.isFeatured = true;
-    if (type === 'popular') payload.isPopular = true;
-    if (type === 'history') payload.isHestory = true;
-    try {
-      const { data } = await updateNewsType(id, payload, store.token);
-      toast.success(data.message);
-      setNews((prev) => prev.map((n) => n._id === id ? { ...n, ...payload } : n));
-    } catch { toast.error('Type update failed'); }
+    if (typeVal === 'breaking') payload.isBreaking = true;
+    if (typeVal === 'trending') payload.isTrending = true;
+    if (typeVal === 'featured') payload.isFeatured = true;
+    if (typeVal === 'popular') payload.isPopular = true;
+    if (typeVal === 'history') payload.isHestory = true;
+
+    updateTypeMutation.mutate({ id, payload });
   };
 
-  const [sendingPush, setSendingPush] = useState(null);
-
-  const handleSendPush = async (id, title) => {
-    try {
-      setSendingPush(id);
-      const { data } = await sendNewsNotification(id, store.token);
-      toast.success(data.message || `Push notification sent for "${title.slice(0, 20)}..."`);
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.response?.data?.message || 'Failed to send push notification');
-    } finally {
-      setSendingPush(null);
-    }
+  const handleSendPush = (id) => {
+    sendNotificationMutation.mutate(id);
   };
 
   const isAdmin = store?.userInfo?.role === 'admin';
 
   return (
     <div className="space-y-0">
-
       {/* ── search + filters bar ── */}
       <div className="px-4 pt-4 pb-2 space-y-3">
         {/* search */}
@@ -216,7 +215,6 @@ const NewContent = () => {
       {/* ── table ── */}
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-
           <thead>
             <tr className="bg-gray-50 border-y border-gray-100">
               {['#', 'Article', 'Image', 'Category', 'Date', 'Status', 'Type', 'Actions']
@@ -240,7 +238,6 @@ const NewContent = () => {
             ) : (
               news.map((n, i) => (
                 <tr key={n._id} className="hover:bg-gray-50/60 transition-colors">
-
                   {/* # */}
                   <td className="px-4 py-3 text-xs text-gray-400 font-mono">
                     {(page - 1) * parPage + i + 1}
@@ -286,6 +283,7 @@ const NewContent = () => {
                     <StatusBadge
                       status={n.status}
                       isAdmin={isAdmin}
+                      isUpdating={updateStatusMutation.isPending && updateStatusMutation.variables?.id === n._id}
                       onClick={() =>
                         handleStatus(n.status === 'active' ? 'deactive' : 'active', n._id)
                       }
@@ -313,17 +311,17 @@ const NewContent = () => {
                   {/* actions */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      {/* Send Push Notification to all subscribers */}
-                      <button
-                        onClick={() => handleSendPush(n._id, n.title)}
-                        disabled={sendingPush === n._id}
-                        className="p-1.5 rounded-lg text-amber-500 hover:text-amber-600 hover:bg-amber-50 transition disabled:opacity-50"
-                        title="Send Push Notification to Subscribers"
-                      >
-                        <FaBell size={15} className={sendingPush === n._id ? 'animate-bounce' : ''} />
-                      </button>
 
-                      {/* View details — available to everyone */}
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleSendPush(n._id)}
+                          disabled={sendNotificationMutation.isPending && sendNotificationMutation.variables === n._id}
+                          className="p-1.5 rounded-lg text-amber-500 hover:text-amber-600 hover:bg-amber-50 transition disabled:opacity-50"
+                          title="Send Push Notification to Subscribers"
+                        >
+                          <FaBell size={15} className={sendNotificationMutation.isPending && sendNotificationMutation.variables === n._id ? 'animate-bounce' : ''} />
+                        </button>
+                      )}
                       <Link
                         to={`/dashboard/news/details/${n._id}`}
                         className="p-1.5 rounded-lg text-purple-400 hover:text-purple-600 hover:bg-purple-50 transition"
@@ -335,6 +333,7 @@ const NewContent = () => {
                       {isAdmin && (
                         <button
                           onClick={() => handleDelete(n._id)}
+                          disabled={deleteNewsMutation.isPending && deleteNewsMutation.variables === n._id}
                           className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition"
                           title="Delete"
                         >
@@ -352,7 +351,6 @@ const NewContent = () => {
                       )}
                     </div>
                   </td>
-
                 </tr>
               ))
             )}
@@ -374,7 +372,6 @@ const NewContent = () => {
           totalItem={total}
         />
       </div>
-
     </div>
   );
 };

@@ -1,13 +1,27 @@
+import { useState } from "react";
+import toast from 'react-hot-toast';
+import { useAddYoutubeVideoMutation } from "../../hooks/api/useVideoQueries";
 
-import React, { useState } from "react";
-import { base_url } from "../../config/config";
 export default function AddVideo() {
   const [title, setTitle] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const addYoutubeVideoMutation = useAddYoutubeVideoMutation({
+    onSuccess: () => {
+      setMessage("Video added successfully ✅");
+      toast.success("YouTube video added successfully");
+      setTitle("");
+      setVideoUrl("");
+    },
+    onError: (error) => {
+      const errMsg = error.response?.data?.message || error.message || "Something went wrong";
+      setMessage(errMsg);
+      toast.error(errMsg);
+    },
+  });
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!title || !videoUrl) {
@@ -15,33 +29,8 @@ export default function AddVideo() {
       return;
     }
 
-    try {
-      setLoading(true);
-      setMessage("");
-
-      const res = await fetch(`${base_url}/api/youtube/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ title, videoUrl }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message);
-      }
-
-      setMessage("Video added successfully ✅");
-      setTitle("");
-      setVideoUrl("");
-
-    } catch (error) {
-      setMessage(error.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    setMessage("");
+    addYoutubeVideoMutation.mutate({ title, videoUrl });
   };
 
   return (
@@ -85,10 +74,10 @@ export default function AddVideo() {
           {/* BUTTON */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={addYoutubeVideoMutation.isPending}
             className="w-full bg-red-600 hover:bg-red-700 transition duration-300 text-white font-semibold py-3 rounded-lg"
           >
-            {loading ? "Adding..." : "Add Video"}
+            {addYoutubeVideoMutation.isPending ? "Adding..." : "Add Video"}
           </button>
 
           {/* MESSAGE */}

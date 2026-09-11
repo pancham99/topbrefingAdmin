@@ -1,17 +1,15 @@
-import { useState, useEffect, useContext, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import moment from 'moment-timezone'
 import toast from 'react-hot-toast'
 import {
-  MdArrowBack, MdDelete, MdOutlineThumbUp,
+  MdArrowBack, MdDelete,
   MdOutlineChatBubbleOutline, MdOpenInNew,
 } from 'react-icons/md'
 import { FaUserCircle, FaHeart, FaBell } from 'react-icons/fa'
 import { HiOutlineNewspaper } from 'react-icons/hi2'
-import storeContext from '../../context/storeContext'
-import { base_url } from '../../config/config'
-import { sendNewsNotification } from '../../services/newsService'
+import axiosInstance from '../../api/axiosInstance'
+import { useGetNewsDetails, useSendNewsNotificationMutation } from '../../hooks/api/useNewsQueries'
 
 /* ── stat card ── */
 const StatCard = ({ icon: Icon, label, value, color }) => (
@@ -52,69 +50,60 @@ const Skeleton = () => (
 /* ══════════════════════════════════════════════════════ */
 const NewsDetails = () => {
   const { news_id } = useParams()
-  const { store } = useContext(storeContext)
   const navigate = useNavigate()
 
-  const [news, setNews]       = useState(null)
+  const { data: newsData, isLoading: newsLoading } = useGetNewsDetails(news_id);
+  const news = newsData?.news;
+
   const [comments, setComments] = useState([])
-  const [likes, setLikes]     = useState([])       // full like objects with user info
+  const [likes, setLikes]     = useState([])
   const [likeCount, setLikeCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [sendingPush, setSendingPush] = useState(false)
-  const [tab, setTab]         = useState('comments') // 'comments' | 'likes'
+  const [deleting, setDeleting] = useState(null)
+  const [tab, setTab]         = useState('comments')
 
-  const headers = { Authorization: `Bearer ${store.token}` }
+  const sendPushMutation = useSendNewsNotificationMutation({
+    onSuccess: (data) => {
+      toast.success(data?.message || 'Push notification sent to subscribers!');
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || 'Failed to send push notification');
+    },
+  });
 
-  const handleSendPush = async () => {
-    try {
-      setSendingPush(true)
-      const { data } = await sendNewsNotification(news_id, store.token)
-      toast.success(data.message || 'Push notification sent to subscribers!')
-    } catch (err) {
-      console.error(err)
-      toast.error(err?.response?.data?.message || 'Failed to send push notification')
-    } finally {
-      setSendingPush(false)
-    }
+  const handleSendPush = () => {
+    sendPushMutation.mutate(news_id);
   }
 
-  const fetchNews = useCallback(async () => {
-    const { data } = await axios.get(`${base_url}/api/news/${news_id}`, { headers })
-    setNews(data.news)
-  }, [news_id])
-
   const fetchComments = useCallback(async () => {
-    const { data } = await axios.get(`${base_url}/api/comment/get/${news_id}`)
-    setComments(data.comments || [])
+    try {
+      const { data } = await axiosInstance.get(`/api/comment/get/${news_id}`)
+      setComments(data.comments || [])
+    } catch (e) {
+      console.error(e)
+    }
   }, [news_id])
 
   const fetchLikes = useCallback(async () => {
-    const { data } = await axios.get(`${base_url}/api/like/detail/${news_id}`)
-    setLikes(data.likes || [])
-    setLikeCount(data.likeCount || 0)
+    try {
+      const { data } = await axiosInstance.get(`/api/like/detail/${news_id}`)
+      setLikes(data.likes || [])
+      setLikeCount(data.likeCount || 0)
+    } catch (e) {
+      console.error(e)
+    }
   }, [news_id])
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      try {
-        await Promise.all([fetchNews(), fetchComments(), fetchLikes()])
-      } catch (e) {
-        toast.error('Failed to load article')
-      } finally {
-        setLoading(false)
-      }
+    if (news_id) {
+      fetchComments()
+      fetchLikes()
     }
-    load()
-  }, [fetchNews, fetchComments, fetchLikes])
+  }, [news_id, fetchComments, fetchLikes])
 
   const handleDeleteComment = async (commentId) => {
     setDeleting(commentId)
     try {
-      await axios.delete(`${base_url}/api/comment/delete/${commentId}`, {
-        data: {},
-        headers,
-      })
+      await axiosInstance.delete(`/api/comment/delete/${commentId}`)
       setComments((prev) => prev.filter((c) => c._id !== commentId))
       toast.success('Comment deleted')
     } catch {
@@ -126,7 +115,7 @@ const NewsDetails = () => {
 
   const fmt = (d) => moment.utc(d).tz('Asia/Kolkata').format('DD MMM YYYY · hh:mm A')
 
-  if (loading) return <div className="max-w-5xl mx-auto"><Skeleton /></div>
+  if (newsLoading) return <div className="max-w-5xl mx-auto"><Skeleton /></div>
 
   if (!news) return (
     <div className="flex flex-col items-center justify-center py-24 text-gray-400">
@@ -138,7 +127,6 @@ const NewsDetails = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-5 pb-12">
-
       {/* ── breadcrumb bar ── */}
       <div className="flex items-center justify-between">
         <button
@@ -150,12 +138,12 @@ const NewsDetails = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleSendPush}
-            disabled={sendingPush}
+            disabled={sendPushMutation.isPending}
             className="flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200
                        px-3 py-1.5 rounded-lg hover:bg-amber-100 transition font-semibold cursor-pointer disabled:opacity-50"
           >
-            <FaBell size={13} className={sendingPush ? 'animate-bounce' : ''} />
-            {sendingPush ? 'Broadcasting...' : 'Broadcast Push Notification'}
+            <FaBell size={13} className={sendPushMutation.isPending ? 'animate-bounce' : ''} />
+            {sendPushMutation.isPending ? 'Broadcasting...' : 'Broadcast Push Notification'}
           </button>
           <a
             href={`https://topbriefing.in/news/${news.slug}`}
@@ -171,7 +159,7 @@ const NewsDetails = () => {
 
       {/* ── stats ── */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard icon={FaHeart}                   label="Total Likes"    value={likeCount}       color="bg-red-500" />
+        <StatCard icon={FaHeart} label="Total Likes" value={likeCount} color="bg-red-500" />
         <StatCard icon={MdOutlineChatBubbleOutline} label="Total Comments" value={comments.length} color="bg-blue-500" />
       </div>
 
@@ -227,8 +215,6 @@ const NewsDetails = () => {
 
       {/* ── tabs: Comments | Likes ── */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-
-        {/* tab header */}
         <div className="flex border-b border-gray-100 px-4 gap-2">
           <Tab active={tab === 'comments'} onClick={() => setTab('comments')}>
             🗨️ Comments ({comments.length})
@@ -238,7 +224,6 @@ const NewsDetails = () => {
           </Tab>
         </div>
 
-        {/* ── COMMENTS TAB ── */}
         {tab === 'comments' && (
           <>
             {comments.length === 0 ? (
@@ -277,7 +262,6 @@ const NewsDetails = () => {
           </>
         )}
 
-        {/* ── LIKES TAB ── */}
         {tab === 'likes' && (
           <>
             {likes.length === 0 ? (
@@ -285,16 +269,11 @@ const NewsDetails = () => {
             ) : (
               <div className="divide-y divide-gray-50">
                 {likes.map((like, i) => (
-                  <div key={like._id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition">
-                    {/* index */}
+                  <div key={like._id || i} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition">
                     <span className="text-xs text-gray-300 font-mono w-5 shrink-0">{i + 1}</span>
-
-                    {/* avatar */}
                     <div className="w-8 h-8 rounded-full bg-red-50 border border-red-100 flex items-center justify-center shrink-0">
                       <FaUserCircle className="text-red-300 text-lg" />
                     </div>
-
-                    {/* user info */}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-800 truncate">
                         {like.userId?.name || 'Unknown User'}
@@ -303,8 +282,6 @@ const NewsDetails = () => {
                         <p className="text-xs text-gray-400 truncate">{like.userId.email}</p>
                       )}
                     </div>
-
-                    {/* liked at */}
                     <div className="text-right shrink-0">
                       <p className="text-xs text-gray-400">
                         {moment.utc(like.createdAt).tz('Asia/Kolkata').format('DD MMM YYYY')}
@@ -313,8 +290,6 @@ const NewsDetails = () => {
                         {moment.utc(like.createdAt).tz('Asia/Kolkata').format('hh:mm A')}
                       </p>
                     </div>
-
-                    {/* heart icon */}
                     <FaHeart className="text-red-400 shrink-0" size={13} />
                   </div>
                 ))}
@@ -322,10 +297,9 @@ const NewsDetails = () => {
             )}
           </>
         )}
-
       </div>
     </div>
   )
 }
 
-export default NewsDetails
+export default NewsDetails;

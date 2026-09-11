@@ -1,46 +1,39 @@
-import React, { useContext, useState } from 'react'
-import { Link } from "react-router-dom"
-import toast from 'react-hot-toast'
-import axiosInstance from '../../services/axiosInstance'
-import storeContext from '../../context/storeContext'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
+import { useAddWriterMutation } from '../../hooks/api/useAuthQueries';
 
 const AddWriter = () => {
-  const navigate = useNavigate()
-  const { store } = useContext(storeContext)
+  const navigate = useNavigate();
 
   const [state, setState] = useState({
     name: '',
     email: '',
     password: '',
     category: '',
-  })
+  });
 
   const inputHandler = (e) => {
     setState({
       ...state,
       [e.target.name]: e.target.value
-    })
-  }
+    });
+  };
 
-  const [loader, setLoader] = useState(false)
+  const addWriterMutation = useAddWriterMutation({
+    onSuccess: (data) => {
+      toast.success(data?.message || "Writer added successfully");
+      navigate('/dashboard/writers');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || error.message || "Failed to add writer");
+    },
+  });
 
-  const submit = async (e) => {
-    e.preventDefault()
-    try {
-      setLoader(true)
-      const { data } = await axiosInstance.post('/api/news/writer/add', state)
-
-      setLoader(false)
-      toast.success(data.message)
-      navigate('/dashboard/writers')
-
-    } catch (error) {
-      setLoader(false)
-      toast.error(error.response?.data?.message || error.message || "Failed to add writer")
-      console.log(error)
-    }
-  }
+  const submit = (e) => {
+    e.preventDefault();
+    addWriterMutation.mutate(state);
+  };
 
   return (
     <div className='bg-white rounded-md'>
@@ -50,7 +43,6 @@ const AddWriter = () => {
       </div>
 
       <div className='p-4'>
-
         <form onSubmit={submit}>
           <div className='grid lg:grid-cols-2 gap-x-8 mb-3'>
             <div className='flex flex-col gap-y-2 mb-5'>
@@ -60,7 +52,7 @@ const AddWriter = () => {
 
             <div className='flex flex-col gap-y-2 mb-5'>
               <label className='text-md font-medium text-gray-600' htmlFor='category'>Category</label>
-              <select onChange={inputHandler} value={state.category} required name='category' id='category' type='text' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10'>
+              <select onChange={inputHandler} value={state.category} required name='category' id='category' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10'>
                 <option value="">---select category--</option>
                 <option value="शिक्षा">शिक्षा</option>
                 <option value="राजनीति ">राजनीति </option>
@@ -78,32 +70,28 @@ const AddWriter = () => {
                 <option value="बाज़ार">बाज़ार</option>
                 <option value="राशि">राशि</option>
                 <option value="सरकारी योजनाओं">सरकारी योजनाओं</option>
-
-
-
-
               </select>
             </div>
 
-
             <div className='flex flex-col gap-y-2 mb-5'>
               <label className='text-md font-medium text-gray-600' htmlFor='email'>Email</label>
-              <input onChange={inputHandler} value={state.email} required type='text' placeholder='email' name='email' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id='name' />
+              <input onChange={inputHandler} value={state.email} required type='email' placeholder='email' name='email' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' id='email' />
             </div>
 
             <div className='flex flex-col gap-y-2 mb-5'>
               <label className='text-md font-medium text-gray-600' htmlFor='password'>Password</label>
-              <input onChange={inputHandler} value={state.password} name='password' id='password' type='password' placeholder='password' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' />
-
+              <input onChange={inputHandler} value={state.password} required name='password' id='password' type='password' placeholder='password' className='px-3 py-2 rounded-md outline-0 border border-gray-300 focus:border-green-500 h-10' />
             </div>
           </div>
           <div className='mt-2'>
-            <button disabled={loader} className='px-3 py-[6px] bg-red-500 rounded-md text-white hover:bg-red-600' to='/dashboard/writers'>{loader ? "Loading.." : "Add Writers"}</button>
+            <button disabled={addWriterMutation.isPending} type="submit" className='px-3 py-[6px] bg-red-500 rounded-md text-white hover:bg-red-600'>
+              {addWriterMutation.isPending ? "Loading.." : "Add Writers"}
+            </button>
           </div>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AddWriter
+export default AddWriter;
