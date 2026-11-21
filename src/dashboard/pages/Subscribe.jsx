@@ -136,15 +136,32 @@ const Subscribers = () => {
                   <td className="px-5 py-4">
                     {getDeviceBadge(s.deviceInfo)}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-4 max-w-xs">
                     <p className="text-xs font-mono text-slate-700 font-medium">
                       {s.ip || "—"}
                     </p>
-                    {(s.location || s.city || s.country) && (
+                    {s.formatAddress ? (
+                      <div className="mt-1">
+                        <p className="text-[11px] text-emerald-800 font-semibold flex items-start gap-1 leading-tight" title={s.formatAddress}>
+                          <span className="shrink-0">📍</span>
+                          <span>{s.formatAddress}</span>
+                        </p>
+                        {s.latitude && s.longitude && (
+                          <a
+                            href={`https://www.google.com/maps?q=${s.latitude},${s.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block text-[10px] text-blue-600 hover:underline font-mono mt-0.5"
+                          >
+                            🗺️ {s.latitude.toFixed(4)}, {s.longitude.toFixed(4)}
+                          </a>
+                        )}
+                      </div>
+                    ) : (s.location || s.city || s.country) ? (
                       <p className="text-[11px] text-emerald-700 font-medium mt-0.5 flex items-center gap-1">
                         📍 {s.location || [s.city, s.region, s.country].filter(Boolean).join(", ")}
                       </p>
-                    )}
+                    ) : null}
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-1.5">

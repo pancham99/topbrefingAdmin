@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import DashboardGraph from '../components/DashboardGraph';
 import { useGetDashboardStats } from '../../hooks/api/useDashboardQueries';
 import { useGetNews } from '../../hooks/api/useNewsQueries';
+import { useGetAnalytics } from '../../hooks/api/useAnalyticsQueries';
 import storeContext from '../../context/storeContext';
 import moment from 'moment-timezone';
 import {
@@ -20,6 +21,8 @@ import {
   HiOutlineBell,
   HiOutlineEye,
   HiOutlineSparkles,
+  HiOutlineMapPin,
+  HiOutlineGlobeAlt,
 } from 'react-icons/hi2';
 
 /* ─── Stat Card Component ─────────────────────────────────────────── */
@@ -80,7 +83,9 @@ const AdminIndex = () => {
   const { store } = useContext(storeContext);
   const { data: total, isLoading: loading } = useGetDashboardStats();
   const { data: recentNewsData, isLoading: recentLoading } = useGetNews('limit=5');
+  const { data: analyticsData, isLoading: analyticsLoading } = useGetAnalytics();
 
+  const visitorAnalytics = analyticsData?.analytics?.slice(0, 10) || [];
   const recentNews = recentNewsData?.news?.slice(0, 5) || [];
   const userName = store?.userInfo?.name || 'Admin';
 
@@ -364,6 +369,120 @@ const AdminIndex = () => {
         </div>
 
       </div>
+
+      {/* ─── Visitor Geolocation & Address Tracking Section ─── */}
+      {/* <div className="bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow p-6 space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b border-gray-100 gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <HiOutlineMapPin className="text-emerald-600" size={20} />
+              <h2 className="text-base font-bold text-gray-800">Visitor Geolocation & Address Log</h2>
+            </div>
+            <p className="text-xs text-gray-400 mt-0.5">Aggregated by Unique Device ID & Address with visit counters</p>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="px-3 py-1 rounded-full font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Unique Devices: {visitorAnalytics.length}
+            </span>
+            <span className="px-3 py-1 rounded-full font-semibold bg-purple-50 text-purple-700 border border-purple-200">
+              Total Page Views: {analyticsData?.totalClicks || visitorAnalytics.reduce((a, b) => a + (b.visitCount || 1), 0)}
+            </span>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-gray-100 text-[11px] uppercase font-bold text-gray-400 tracking-wider bg-gray-50/50">
+                <th className="py-2.5 px-3">No</th>
+                <th className="py-2.5 px-3">Device Specs & IP</th>
+                <th className="py-2.5 px-3">Full Formatted Address (formatAddress)</th>
+                <th className="py-2.5 px-3">City & Region</th>
+                <th className="py-2.5 px-3">Coordinates (Lat, Lon)</th>
+                <th className="py-2.5 px-3 text-center">Visits</th>
+                <th className="py-2.5 px-3 text-right">Last Active Time</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50 text-xs text-gray-700">
+              {analyticsLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="py-3 px-3"><div className="h-4 bg-gray-200 rounded w-6" /></td>
+                    <td className="py-3 px-3"><div className="h-4 bg-gray-200 rounded w-32" /></td>
+                    <td className="py-3 px-3"><div className="h-4 bg-gray-200 rounded w-64" /></td>
+                    <td className="py-3 px-3"><div className="h-4 bg-gray-200 rounded w-24" /></td>
+                    <td className="py-3 px-3"><div className="h-4 bg-gray-200 rounded w-24" /></td>
+                    <td className="py-3 px-3 text-center"><div className="h-4 bg-gray-200 rounded w-12 mx-auto" /></td>
+                    <td className="py-3 px-3 text-right"><div className="h-4 bg-gray-200 rounded w-20 ml-auto" /></td>
+                  </tr>
+                ))
+              ) : visitorAnalytics.length > 0 ? (
+                visitorAnalytics.map((item, idx) => {
+                  const devName = item.deviceName || (item.device === 'Mobile' ? 'Mobile Browser' : 'Desktop PC');
+                  const devIdShort = item.deviceId ? item.deviceId.slice(-6) : null;
+
+                  return (
+                    <tr key={item._id || idx} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="py-3 px-3 font-semibold text-gray-400">{idx + 1}</td>
+                      <td className="py-3 px-3 max-w-[200px]">
+                        <p className="font-bold text-gray-800 text-xs flex items-center gap-1.5">
+                          <span>{item.device === 'Mobile' || /Mobile|iPhone|Android/i.test(devName) ? '📱' : '💻'}</span>
+                          <span className="truncate">{devName}</span>
+                        </p>
+                        <p className="text-[11px] text-gray-500 font-mono mt-0.5">
+                          {item.ip || '—'} • {item.os || 'OS'} {item.browser ? `(${item.browser})` : ''}
+                        </p>
+                        {devIdShort && (
+                          <span className="inline-block text-[9px] font-mono font-semibold bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded border border-gray-200 mt-0.5">
+                            ID: #{devIdShort}
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 max-w-sm">
+                        <p className="font-semibold text-emerald-800 text-[11px] leading-snug flex items-start gap-1" title={item.formatAddress || item.address}>
+                          <span className="shrink-0 mt-0.5">📍</span>
+                          <span>{item.formatAddress || item.address || 'Address unavailable'}</span>
+                        </p>
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                          {[item.city, item.region, item.country].filter(Boolean).join(', ') || 'Unknown'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 whitespace-nowrap">
+                        {item.latitude && item.longitude ? (
+                          <a
+                            href={`https://www.google.com/maps?q=${item.latitude},${item.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-blue-600 hover:text-blue-800 hover:underline bg-blue-50 px-2 py-1 rounded border border-blue-200"
+                          >
+                            🗺️ {Number(item.latitude).toFixed(4)}, {Number(item.longitude).toFixed(4)}
+                          </a>
+                        ) : (
+                          <span className="text-gray-400 text-xs">—</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3 text-center whitespace-nowrap">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm inline-flex items-center gap-1">
+                          🔄 {item.visitCount || 1} Visits
+                        </span>
+                      </td>
+                      <td className="py-3 px-3 text-right whitespace-nowrap text-gray-500">
+                        {moment.utc(item.lastVisitedAt || item.updatedAt || item.createdAt).tz('Asia/Kolkata').format('DD MMM YYYY, hh:mm A')}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="7" className="py-8 text-center text-gray-400">No visitor geolocation logs found yet.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div> */}
     </div>
   );
 };
