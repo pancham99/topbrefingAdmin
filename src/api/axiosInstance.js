@@ -3,6 +3,8 @@ import { base_url } from "../config/config";
 
 const LIVE_BACKEND_URL = "https://bakendtopbrefing.vercel.app";
 
+// const LIVE_BACKEND_URL = 'http://localhost:5001';
+
 const axiosInstance = axios.create({
   baseURL: base_url,
   timeout: 15000,
