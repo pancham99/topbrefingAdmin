@@ -1,5 +1,5 @@
 
-const LIVE_API_URL = 'https://bakendtopbrefing.onrender.com';
+const LIVE_API_URL = 'https://bakendtopbrefing.vercel.app';
 
 const getBaseUrl = () => {
   if (import.meta.env?.VITE_API_URL) {

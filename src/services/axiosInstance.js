@@ -2,7 +2,7 @@ import axios from "axios";
 import { base_url } from "../config/config";
 
 // const LIVE_BACKEND_URL = "https://bakendtopbrefing.vercel.app";
-const LIVE_BACKEND_URL = "https://bakendtopbrefing.onrender.com/";
+const LIVE_BACKEND_URL = "https://bakendtopbrefing.vercel.app/";
 
 
 const axiosInstance = axios.create({
